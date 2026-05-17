@@ -7,3 +7,6 @@ def first_key(d : dict, value, default_value=None):
     if not default_value:
         raise ValueError(f"Value {value} not found in dictionary.")
     return first_key(d, default_value, default_value=None)
+
+UNKNOWN_KEY = "UNKNOWN"
+UNKNOWN_VALUE = -1
