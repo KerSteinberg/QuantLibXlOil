@@ -54,7 +54,6 @@ xlOil function annotations are specified as follows:
     group=EXCEL_GROUP_NAME,
     )
 def qlFunctionName(arg1 : Type1, arg2 : Type2, Trigger = None):
-    """One-line docstring."""
     ...
     return someThing
 ```
@@ -67,7 +66,7 @@ Help string is a capitalised sentence finished with punctuation.
 
 Excel argument names `Arg1` and `Arg2` equal function argument names but with starting capital letter.
 
-Python docstring equals the Excel help string.
+No Python docstring or Python docstring equals the Excel help string.
 
 ### Additional Trigger Function Argument
 
