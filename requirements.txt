@@ -1,0 +1,7 @@
+
+# Conda environment dependencies
+pytest
+QuantLib-Python
+
+# pip dependencies
+xloil
