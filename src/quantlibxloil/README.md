@@ -24,7 +24,7 @@ Function argument names follow the names of the SWIG interface names.
 
 Argument types are specified as type annotations. Build-in types (`str`, `int`, `float`, `bool`) are used directly.
 
-Dates from Excel are supplied as serial numbers. We use the `qlDate` argument [converter function](https://xloil.readthedocs.io/en/stable/xlOil_Python/TypeConversion.html#custom-type-conversion) for type annotation.
+Dates from Excel are supplied as serial numbers. We use the `qDate` argument [converter function](https://xloil.readthedocs.io/en/stable/xlOil_Python/TypeConversion.html#custom-type-conversion) for type annotation.
 
 QuantLib object types are used directly as type annotations. User-created QuantLib object are stored in the xlOil cache and are supplied by xlOil as objects to the function.
 
@@ -38,7 +38,7 @@ Function results are returned as is.
 
 If the result type has a custom argument converter then a corresponding custom return [type conversion] (https://xloil.readthedocs.io/en/stable/xlOil_Python/TypeConversion.html#custom-return-conversion) should be implemented as well.
 
-Return type converters are use the function name prefix `xl`, e.g., `xlDate(...)` for conversion from `qlDate` to excel serial number.
+Return type converters are use the function name prefix `x`, e.g., `xDate(...)` for conversion from `ql.Date` to excel serial number.
 
 ### Function Annotations
 
@@ -50,11 +50,10 @@ xlOil function annotations are specified as follows:
     args={
         'Arg1': 'Help on Arg1 parameter.',
         'Arg1': 'Help on Arg1 parameter.',
-        'Trigger' : 'Track cell dependencies.'
     },
     group=EXCEL_GROUP_NAME,
     )
-def qlFunctionName(arg1 : Type1, arg2 : Type2, trigger = None):
+def qlFunctionName(arg1 : Type1, arg2 : Type2, Trigger = None):
     """One-line docstring."""
     ...
     return someThing
@@ -72,7 +71,7 @@ Python docstring equals the Excel help string.
 
 ### Additional Trigger Function Argument
 
-Functions should include an additional `trigger` argument as specified in the section above.
+Functions should include an additional `Trigger` argument as specified in the section above. We use a capitalized variable (only) here, because optional parameters are not picked up in the Excel help strings. 
 
 QuantLib functions (may) depend on session data and QuantLib's internal state. As a consequence, updates may not be propagated through Excel's dependency tree.
 
@@ -80,7 +79,7 @@ For example, the `Index.fixing(...)` method depends on the session-specific `eva
 
 Another example is the method `Instrument.NPV()`. This method requires a preceding call of `Instrument.setPricingEngine(engine)`. However, Excel on its own cannot determine that the pricing engine needs to be linked to the instrument before an NPV can be calculated. 
 
-To mitigate above limitation, the `trigger` argument allows specifying additional input cells. That way, the QuantLib dependencies can be reflected in Excel's dependency graph by the user.
+To mitigate above limitation, the `Trigger` argument allows specifying additional input cells. That way, the QuantLib dependencies can be reflected in Excel's dependency graph by the user.
 
 ### Enumerations and Enumerated Classes
 
@@ -93,7 +92,7 @@ Enumerations and enumerated classes are represented by string identifiers in Exc
 The string identifiers are mapped to QuantLib objects via (constant) dictionaries as follows.
 
 ```
-TYPE_NAME = {
+QL_TYPE_NAME = {
     'STRINGIDENTIER' : ql.Type1,
     'STRINGIDENTIER' : ql.Type2,
     ...
