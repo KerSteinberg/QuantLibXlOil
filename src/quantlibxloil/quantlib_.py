@@ -1,4 +1,4 @@
-# we use quantlibpy.py to avoid confusion with the quantlib module in the same package.
+# we use quantlib_.py to avoid confusion with the quantlib module in the same package.
 
 import QuantLib as ql
 import xloil as xlo

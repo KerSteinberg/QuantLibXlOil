@@ -1,7 +1,7 @@
 import QuantLib as ql
 import xloil as xlo
 
-from .config import EXCEL_GROUP_NAME, TRIGGER_ARG, TRIGGER_DESC
+from .config import EXCEL_GROUP_NAME
 
 QL_FREQUENCY = {
     "ANNUAL": ql.Annual,

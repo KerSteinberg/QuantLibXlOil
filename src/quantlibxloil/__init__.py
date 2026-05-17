@@ -1,2 +1,2 @@
 from quantlibxloil.date import *
-from quantlibxloil.quantlibpy import *
+from quantlibxloil.quantlib_ import *
