@@ -397,7 +397,7 @@ def qlFuturesRateHelper(
     end_of_month: bool, 
     day_counter: qDayCounter, 
     convexity_adjustment: qQuoteHandle = ql.QuoteHandle(), 
-    type: qFuturesType = ql.IMM,
+    type: qFuturesType = ql.Futures.IMM,
     trigger = None
     ) -> ql.FuturesRateHelper:
     return ql.FuturesRateHelper(
@@ -430,7 +430,7 @@ def qlFuturesRateHelper2(
     ibor_end_date: qDate, 
     day_counter: qDayCounter, 
     convexity_adjustment: qQuoteHandle = ql.QuoteHandle(), 
-    type: qFuturesType = ql.IMM,
+    type: qFuturesType = ql.Futures.IMM,
     trigger = None
     ) -> ql.FuturesRateHelper:
     return ql.FuturesRateHelper(
@@ -458,7 +458,7 @@ def qlFuturesRateHelper3(
     ibor_start_date: qDate, 
     index: ql.IborIndex, 
     convexity_adjustment: qQuoteHandle = ql.QuoteHandle(), 
-    type: qFuturesType = ql.IMM,
+    type: qFuturesType = ql.Futures.IMM,
     trigger = None
     ) -> ql.FuturesRateHelper:
     return ql.FuturesRateHelper(
