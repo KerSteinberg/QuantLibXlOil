@@ -1,0 +1,1019 @@
+import QuantLib as ql
+import xloil as xlo
+
+from .calendars import qBusinessDayConvention, qCalendar
+from .cashflows import _to_ql_leg
+from .config import EXCEL_GROUP_NAME
+from .date import qDate, qFrequency, qPeriod
+from .daycounters import qDayCounter
+from .termstructures import qCompounding
+from .utilities import UNKNOWN_KEY, UNKNOWN_VALUE, enum_value
+
+QL_BOND_PRICE_TYPE = {
+    "CLEAN": ql.BondPrice.Dirty,
+    "DIRTY": ql.BondPrice.Clean,
+}
+
+QL_CALLABILITY_TYPE = {
+    "CALL": ql.Callability.Call,
+    "PUT": ql.Callability.Put,
+}
+
+def _qBondPriceType(price_type: str) -> ql.BondPrice:
+    return enum_value(price_type, QL_BOND_PRICE_TYPE)
+
+def _qCallabilityType(callability_type: str) -> ql.Callability.Type:
+    return enum_value(callability_type, QL_CALLABILITY_TYPE)    
+
+@xlo.converter()
+def qBondPriceType(price_type: str) -> ql.BondPrice:
+    return _qBondPriceType(price_type)
+
+@xlo.converter()
+def qCallabilityType(callability_type: str) -> ql.Callability.Type:
+    return _qCallabilityType(callability_type)
+  
+@xlo.func(
+    help='Create a QuantLib BondPrice object from an amount and price type.',
+    args={
+        'amount': 'The bond price amount.',
+        'price_type': 'The bond price type (e.g., "CLEAN" or "DIRTY").',
+    },
+    group=EXCEL_GROUP_NAME,
+    )
+def qlBondPrice(amount:float, price_type: str) -> ql.BondPrice:
+    return ql.BondPrice(amount, _qBondPriceType(price_type))
+
+@xlo.func(
+    help='Create a QuantLib Callability object from a bond price, callability type, and date.',
+    args={
+        'price': 'The bond price.',
+        'callability_type': 'The callability type (e.g., "CALL" or "PUT").',
+        'date': 'The date of the callability.',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlCallability(price: qlBondPrice, callability_type: str, date: qDate, trigger = None) -> ql.Callability:
+    return ql.Callability(price, _qCallabilityType(callability_type), date)
+
+# ToDo arg real trigger
+@xlo.func(
+    help='Create a QuantLib SoftCallability object from a bond price, callability type, and date.',
+    args={
+        'price': 'The bond price.',
+        'callability_type': 'The callability type (e.g., "CALL" or "PUT").',
+        'date': 'The date of the callability.',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlSoftCallability(price: qlBondPrice, callability_type: str, date: qDate, trigger = None) -> ql.SoftCallability:
+    return ql.SoftCallability(price, _qCallabilityType(callability_type), date)
+
+@xlo.func(
+    help='Convert a bond price type to its corresponding amount.',
+    args={
+        'price_type': 'The bond price type (e.g., "CLEAN" or "DIRTY").',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondPriceAmount(price_type: ql.BondPrice, trigger = None) -> float:
+    return price_type.amount()
+
+@xlo.func(
+    help='Get the type of a bond price.',
+    args={
+        'price_type': 'The bond price type (e.g., "CLEAN" or "DIRTY").',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondPriceType(price_type: ql.BondPrice, trigger = None) -> str:
+    return price_type.type()
+
+@xlo.func(
+    help='Check if a bond price type is valid.',
+    args={
+        'price_type': 'The bond price type (e.g., "CLEAN" or "DIRTY").',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondPriceIsValid(price_type: ql.BondPrice, trigger = None) -> bool:
+    return price_type.isValid()
+
+@xlo.func(
+    help='Get the price of a callability.',
+    args={
+        'callability': 'The callability object.',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlCallabilityPrice(callability: ql.Callability, trigger = None) -> ql.BondPrice:
+    return callability.price()
+
+@xlo.func(
+    help='Get the type of a callability.',
+    args={
+        'callability': 'The callability object.',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlCallabilityType(callability: ql.Callability, trigger = None) -> str:
+    return callability.type()
+
+@xlo.func(
+    help='Get the date of a callability.',
+    args={
+        'callability': 'The callability object.',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlCallabilityDate(callability: ql.Callability, trigger = None) -> ql.Date:
+    return callability.date()   
+
+@xlo.func(
+    help='Create a QuantLib Bond object with specified settlement days, calendar, and cashflows.',
+    args={
+        'settlement_days': 'The number of settlement days after the trade date.',
+        'calendar': 'The calendar for business day conventions.',
+        'face_amount': 'The face amount (principal) of the bond.',
+        'maturity_date': 'The maturity date of the bond.',
+        'issue_date': 'The issue date of the bond (default: today).',
+        'cashflows': 'The leg containing the bond\'s cashflows (default: empty leg).',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBond(
+    settlement_days: int,
+    calendar: qCalendar,
+    face_amount: float,
+    maturity_date: qDate,
+    cashflows: ql.Leg = ql.Leg(),
+    issue_date: qDate = ql.Date(),
+    trigger = None
+    ) -> ql.Bond:
+    if not cashflows:
+        _cashflows = ql.Leg()
+    else:
+        _cashflows = _to_ql_leg(cashflows)
+    bond = ql.Bond(
+        settlement_days,
+        calendar,
+        face_amount,
+        maturity_date,
+        issue_date,
+        _cashflows)
+
+    if len(bond.cashflows()) == 0:
+        raise ValueError("Cash flows must not be empty.")
+    else:
+        return bond
+
+@xlo.func(
+    help='Create a QuantLib Bond object with specified settlement days, calendar, and coupons.',
+    args={
+        'settlement_days': 'The number of settlement days after the trade date.',
+        'calendar': 'The calendar for business day conventions.',
+        'issue_date': 'The issue date of the bond (default: today).',
+        'coupons': 'The leg containing the bond\'s coupon cashflows (default: empty leg).',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBond2(
+    settlement_days: int,
+    calendar: qCalendar,
+    issue_date: qDate = ql.Date(),
+    coupons = ql.Leg(),
+    trigger = None
+    ) -> ql.Bond:
+    return ql.Bond(
+        settlement_days,
+        calendar,
+        issue_date,
+        coupons
+    )
+
+@xlo.func(
+    help='Get the next coupon rate of a bond as of a given date.',
+    args={
+        'bond': 'The bond object.',
+        'date': 'The reference date (default: today).',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondNextCouponRate(bond: ql.Bond, date: qDate = ql.Date(), trigger = None) -> float:
+    return bond.nextCouponRate(date)
+
+@xlo.func(
+    help='Get the previous coupon rate of a bond as of a given date.',
+    args={
+        'bond': 'The bond object.',
+        'date': 'The reference date (default: today).',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondPreviousCouponRate(bond: ql.Bond, date: qDate = ql.Date(), trigger = None) -> float:
+    return bond.previousCouponRate(date)
+
+@xlo.func(
+    help='Get the next cash flow date of a bond as of a given date.',
+    args={
+        'bond': 'The bond object.',
+        'date': 'The reference date (default: today).',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondNextCashFlowDate(bond: ql.Bond, date: qDate = ql.Date(), trigger = None) -> ql.Date:
+    return bond.nextCashFlowDate(date)
+
+@xlo.func(
+    help='Get the previous cash flow date of a bond as of a given date.',
+    args={
+        'bond': 'The bond object.',
+        'date': 'The reference date (default: today).',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondPreviousCashFlowDate(bond: ql.Bond, date: qDate = ql.Date(), trigger = None) -> ql.Date:
+    return bond.previousCashFlowDate(date)
+
+@xlo.func(
+    help='Get the number of settlement days of a bond.',
+    args={
+        'bond': 'The bond object.',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondSettlementDays(bond: ql.Bond, trigger = None) -> int:
+    return bond.settlementDays()
+
+@xlo.func(
+    help='Get the settlement date of a bond for a given trade date.',
+    args={
+        'bond': 'The bond object.',
+        'date': 'The trade date (default: today).',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondSettlementDate(bond: ql.Bond, date: qDate = ql.Date(), trigger = None) -> ql.Date:
+    return bond.settlementDate(date)
+
+@xlo.func(
+    help='Check if a bond is tradable as of a given date.',
+    args={
+        'bond': 'The bond object.',
+        'date': 'The reference date (default: today).',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondIsTradable(bond: ql.Bond, date: qDate = ql.Date(), trigger = None) -> bool:
+    if len(bond.cashflows()) == 0:
+        return False
+    return bond.isTradable(date)
+
+@xlo.func(
+    help='Get the start date (issue or accrual start date) of a bond.',
+    args={
+        'bond': 'The bond object.',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondStartDate(bond: ql.Bond, trigger = None) -> ql.Date:
+    return bond.startDate()
+
+@xlo.func(
+    help='Get the maturity date of a bond.',
+    args={
+        'bond': 'The bond object.',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondMaturityDate(bond: ql.Bond, trigger = None) -> ql.Date:
+    return bond.maturityDate()
+
+@xlo.func(
+    help='Get the issue date of a bond.',
+    args={
+        'bond': 'The bond object.',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondIssueDate(bond: ql.Bond, trigger = None) -> ql.Date:
+    return bond.issueDate()
+
+@xlo.func(
+    help='Get the cash flows of a bond.',
+    args={
+        'bond': 'The bond object.',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondCashFlows(bond: ql.Bond, trigger = None):
+    return bond.cashflows()
+
+@xlo.func(
+    help='Get the redemption amount of a bond.',
+    args={
+        'bond': 'The bond object.',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondRedemption(bond: ql.Bond, trigger = None):
+    return bond.redemption()
+
+@xlo.func(
+    help='Get the redemption amounts of a bond.',
+    args={
+        'bond': 'The bond object.',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondRedemptions(bond: ql.Bond, trigger = None):
+    return bond.redemptions()
+
+@xlo.func(
+    help='Get the calendar of a bond.',
+    args={
+        'bond': 'The bond object.',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondCalendar(bond: ql.Bond, trigger = None) -> ql.Calendar:
+    return bond.calendar()
+
+@xlo.func(
+    help='Get the notional values of a bond.',
+    args={
+        'bond': 'The bond object.',
+        'date': 'The reference date (default: today).',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondNotionals(bond: ql.Bond, trigger = None):
+    return bond.notionals()
+
+@xlo.func(
+    help='Get the notional value of a bond at a specific date.',
+    args={
+        'bond': 'The bond object.',
+        'date': 'The settlement date.',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondNotional(bond: ql.Bond, date: qDate = ql.Date(), trigger = None) -> float:
+    if len(bond.cashflows()) == 0:
+        return 0.0
+    return bond.notional(date) 
+
+@xlo.func(
+    help='Get the clean price of a bond.',
+    args={
+        'bond': 'The bond object.',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondCleanPrice(bond: ql.Bond, trigger = None) -> float:
+    return bond.cleanPrice()
+
+@xlo.func(
+    help='Get the clean price of a bond with detailed parameters.',
+    args={
+        'bond': 'The bond object.',
+        'yield_': 'The yield as a quote handle.',
+        'dc': 'The day counter.',
+        'compounding': 'The compounding convention.',
+        'frequency': 'The compounding frequency.',
+        'settlement': 'The settlement date (default: today).',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondCleanPrice2(
+        bond: ql.Bond,
+        yield_: float, 
+        dc: qDayCounter, 
+        compounding: qCompounding, 
+        frequency: qFrequency = "annual", 
+        settlement: qDate = ql.Date(),
+        trigger = None
+        ) -> float:
+        return bond.cleanPrice(
+            yield_, 
+            dc,
+            compounding,
+            frequency
+        )
+
+@xlo.func(
+    help='Get the dirty price of a bond.',
+    args={
+        'bond': 'The bond object.',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondDirtyPrice(bond: ql.Bond, trigger = None) -> float:
+    return bond.dirtyPrice()
+
+@xlo.func(
+    help='Get the dirty price of a bond with detailed parameters.',
+    args={
+        'bond': 'The bond object.',
+        'yield_': 'The yield as a quote handle.',
+        'dc': 'The day counter.',
+        'compounding': 'The compounding convention.',
+        'frequency': 'The compounding frequency.',
+        'settlement': 'The settlement date (default: today).',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondDirtyPrice2(
+        bond: ql.Bond,
+        yield_: float, 
+        dc: qDayCounter, 
+        compounding: qCompounding, 
+        frequency: qFrequency, 
+        settlement: qDate = ql.Date(), 
+        trigger = None
+        ) -> float:
+        return bond.dirtyPrice(
+            yield_, 
+            dc, 
+            compounding,
+            frequency, 
+            settlement
+        )
+
+@xlo.func(
+    help='Calculate the yield of a bond.',
+    args={
+        'bond': 'The bond object.',
+        'dc': 'The day counter.',
+        'compounding': 'The compounding convention.',
+        'freq': 'The compounding frequency.',
+        'accuracy': 'Accuracy for yield calculation (default: 1e-8).',
+        'max_evaluations': 'Maximum iterations for yield calculation (default: 100).',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondYield(
+        bond: ql.Bond, 
+        dc: qDayCounter, 
+        compounding: qCompounding, 
+        freq: qFrequency, 
+        accuracy: float = 1.0e-8, 
+        max_evaluations: int = 100, 
+        trigger = None     
+    ) -> float:
+    return bond.bondYield(
+        dc, 
+        compounding, 
+        freq, 
+        accuracy, 
+        max_evaluations
+    )
+
+@xlo.func(
+    help='Calculate the yield of a bond given its price.',
+    args={
+        'bond': 'The bond object.',
+        'price': 'The bond price.',
+        'dc': 'The day counter.',
+        'compounding': 'The compounding convention.',
+        'freq': 'The compounding frequency.',
+        'settlement': 'The settlement date (default: today).',
+        'accuracy': 'Accuracy for yield calculation (default: 1e-8).',
+        'max_evaluations': 'Maximum iterations for yield calculation (default: 100).',
+        'guess': 'Initial guess for yield (default: 0.05).',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondYield2(
+        bond: ql.Bond, 
+        price: qlBondPrice,
+        dc: qDayCounter, 
+        compounding: qCompounding, 
+        freq: qFrequency,
+        settlement: qDate = ql.Date(),
+        accuracy: float = 1.0e-8, 
+        max_evaluations: int = 100,
+        guess: float = 0.05, 
+        trigger = None   
+    ) -> float:
+    return bond.bondYield(
+        ql.BondPrice(price, ql.BondPrice.Dirty),
+        dc, 
+        compounding, 
+        freq, 
+        settlement,
+        accuracy, 
+        max_evaluations,
+        guess
+    )
+
+@xlo.func(
+    help='Get the accrued amount of a bond.',
+    args={
+        'bond': 'The bond object.',
+        'settlement': 'The settlement date (default: today).',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondAccruedAmount(bond: ql.Bond, settlement: qDate = ql.Date(), trigger = None) -> float:
+    return bond.accruedAmount(settlement)
+
+@xlo.func(
+    help='Get the settlement value of a bond.',
+    args={
+        'bond': 'The bond object.',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondSettlementValue(bond: ql.Bond, trigger = None) -> float:
+    return bond.settlementValue()
+
+@xlo.func(
+    help='Get the settlement value of a bond with a clean price.',
+    args={
+        'bond': 'The bond object.',
+        'clean_price': 'The clean price of the bond.',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondSettlementValue2(bond: ql.Bond, clean_price: float, trigger = None) -> float:
+    return bond.settlementValue(clean_price)
+
+# Todo perform tests
+@xlo.func(
+    help='Calculate the clean price of a bond given a Z-spread.',
+    args={
+        'bond': 'The bond object.',
+        'discount_curve': 'The discount curve (yield term structure handle).',
+        'z_spread': 'The Z-spread in decimal form (e.g., 0.01 for 1%).',
+        'dc': 'The day counter.',
+        'compounding': 'The compounding convention.',
+        'freq': 'The compounding frequency.',
+        'settlement_date': 'The settlement date (default: today).',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondCleanPriceFromZSpread(
+    bond: ql.Bond,
+    discount_curve: ql.YieldTermStructureHandle, # eigentlich ql.YieldTermStructure
+    z_spread: float = 0.002,
+    dc: qDayCounter = ql.Actual365Fixed(),
+    compounding: qCompounding= ql.Compounded,
+    freq: qFrequency= ql.Annual,
+    settlement_date: qDate = ql.Date(),
+    trigger = None
+    ) -> float:
+    return ql.BondFunctions.cleanPrice(
+        bond,
+        discount_curve,
+        z_spread, 
+        dc, 
+        compounding,
+        freq, 
+        settlement_date
+    )
+
+# Todo perform tests
+@xlo.func(
+    help='Get the sinking schedule of a bond.',
+    args={
+        'bond': 'The bond object.',
+        'start_date': 'The start date of the sinking schedule.',
+        'bond_length': 'The length of the bond (as a period, e.g., "10Y" for 10 years).',
+        'frequency': 'The frequency of sinking payments.',
+        'payment_calendar': 'The calendar for payment dates.',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondsinkingSchedule(
+    bond: ql.Bond, 
+    start_date: qDate,
+    bond_length: qPeriod,
+    frequency: qFrequency,
+    payment_calendar: qCalendar,
+    trigger = None
+    ) -> ql.Schedule:
+    return bond.sinkingSchedule(
+        start_date,
+        bond_length,
+        frequency,
+        payment_calendar
+    )
+
+# Todo perform tests
+@xlo.func(
+    help='Get the sinking notionals of a bond.',
+    args={
+        'bond': 'The bond object.',
+        'bond_length': 'The length of the bond (as a period, e.g., "10Y" for 10 years).',
+        'frequency': 'The frequency of sinking payments.',
+        'coupon_rate': 'The coupon rate (as a decimal, e.g., 0.05 for 5%).',
+        'initial_notional': 'The initial notional amount of the bond.',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondSinkingNotionals(
+        bond: ql.Bond, 
+        bond_length: qPeriod, 
+        frequency: qFrequency, 
+        coupon_rate: float, 
+        initial_notional: float, 
+        trigger = None):
+    return bond.sinkingNotionals(
+        bond_length,
+        frequency,
+        coupon_rate,
+        initial_notional
+    )
+
+@xlo.func(
+    help='Create a QuantLib ZeroCouponBond object.',
+    args={
+        'settlement_days': 'The number of days to settlement.',
+        'calendar': 'The calendar for date calculations.',
+        'face_amount': 'The face amount of the bond.',
+        'maturity_date': 'The maturity date of the bond.',
+        'business_day_convention': 'The business day convention.',
+        'issue_date': 'The issue date of the bond.',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlZeroCouponBond(
+    settlement_days: int,
+    calendar: qCalendar,
+    face_amount: float,
+    maturity_date: qDate,
+    business_day_convention: qBusinessDayConvention = ql.Following,
+    redemption: float = 100.0,
+    issue_date: qDate = ql.Date(),
+    trigger = None
+    ) -> ql.ZeroCouponBond: 
+    return ql.ZeroCouponBond(
+settlement_days,
+calendar,
+face_amount,
+maturity_date,
+business_day_convention,
+redemption,
+issue_date
+    )
+
+@xlo.func(
+        help='Create a QuantLib FixedRateBond object with detailed parameters.',
+        args={
+            'settlement_days': 'The number of days to settlement.',
+            'face_amount': 'The face amount of the bond.',
+            'schedule': 'The schedule for coupon payments.',
+            'coupons': 'The list of coupon rates.',
+            'payment_day_counter': 'The day counter for payment dates.',
+            'business_day_convention': 'The business day convention.',
+            'redemption': 'The redemption amount (default: 100.0).',
+            'issue_date': 'The issue date of the bond.',
+            'payment_calendar': 'The calendar for payment dates.',
+            'ex_coupon_period': 'The period for ex-coupon dates.',
+            'ex_coupon_calendar': 'The calendar for ex-coupon dates.',
+            'ex_coupon_convention': 'The business day convention for ex-coupon dates.',
+            'ex_coupon_end_of_month': 'Whether to adjust ex-coupon dates to the end of the month.'
+        },
+        group=EXCEL_GROUP_NAME
+    )
+def qlFixedRateBond(
+    settlement_days: int,
+    face_amount: float,
+    schedule: ql.Schedule,
+    coupons: list,
+    payment_day_counter: qDayCounter,
+    business_day_convention: qBusinessDayConvention = ql.Following,
+    redemption: float = 100.0,  
+    issue_date: qDate = ql.Date(),
+    payment_calendar: qCalendar = ql.NullCalendar(),
+    ex_coupon_period: qPeriod = ql.Period(),
+    ex_coupon_calendar: qCalendar = ql.NullCalendar(),
+    ex_coupon_convention: qBusinessDayConvention = ql.Unadjusted,
+    ex_coupon_end_of_month: bool = False,
+    trigger = None
+    ) -> ql.FixedRateBond:
+    return ql.FixedRateBond(
+        settlement_days,
+        face_amount,
+        schedule,
+        coupons,
+        payment_day_counter,
+        business_day_convention,
+        redemption,
+        issue_date,
+        payment_calendar,
+        ex_coupon_period,
+        ex_coupon_calendar,
+        ex_coupon_convention,
+        ex_coupon_end_of_month
+    )
+
+
+@xlo.func( help='Create a QuantLib AmortizingFixedRateBond object .',
+          args={
+              'settlement_days': 'The number of settlement days after the trade date.',
+              'notionals': 'The list of notional amounts for each period.',
+              'schedule': 'The schedule for coupon payments.',
+              'coupons': 'The list of coupon rates.',
+              'accrual_day_counter': 'The day counter for accrual calculations.',
+              'payment_convention': 'The business day convention for payment dates.',
+              'issue_date': 'The issue date of the bond.',
+              'ex_coupon_period': 'The period for ex-coupon dates.',
+              'ex_coupon_calendar': 'The calendar for ex-coupon dates.',
+              'ex_coupon_convention': 'The business day convention for ex-coupon dates.',
+              'ex_coupon_end_of_month': 'Whether to adjust ex-coupon dates to the end of the month.',
+              'redemption': 'The list of redemption amounts (default: [100]).',
+          },
+          group=EXCEL_GROUP_NAME
+      )
+def qlAmortizingFixedRateBond(
+    settlement_days: int,
+    notionals: list,
+    schedule: ql.Schedule,
+    coupons: list,
+    accrual_day_counter: qDayCounter,
+    payment_convention: qBusinessDayConvention = ql.Following,
+    issue_date: qDate = ql.Date(),
+    ex_coupon_period: qPeriod = ql.Period(),
+    ex_coupon_calendar: qCalendar = ql.NullCalendar(),
+    ex_coupon_convention: qBusinessDayConvention = ql.Unadjusted,
+    ex_coupon_end_of_month: bool = False,
+    redemption: list = {100},
+    trigger = None
+    ) -> ql.AmortizingFixedRateBond:
+    return ql.AmortizingFixedRateBond(
+        settlement_days,
+        notionals,
+        schedule,
+        coupons,
+        accrual_day_counter,
+        payment_convention,
+        issue_date,
+        ex_coupon_period,
+        ex_coupon_calendar,
+        ex_coupon_convention,
+        ex_coupon_end_of_month,
+        redemption
+    )
+
+
+# ToDo test caps and floors parameters
+@xlo.func(
+    help='Create a QuantLib AmortizingFloatingRateBond object.',
+    args={
+        'settlement_days': 'The number of settlement days after the trade date.',
+        'notional': 'The list of notional amounts for each period.',
+        'schedule': 'The schedule for coupon payments.',
+        'index': 'The Ibor index for floating rate calculations.',
+        'accrual_day_counter': 'The day counter for accrual calculations.',
+        'payment_convention': 'The business day convention for payment dates.',
+        'fixing_days': 'The number of days for fixing the rate (default: 0).',
+        'gearings': 'The list of gearings for the floating rate (default: [1.0]).',
+        'spreads': 'The list of spreads for the floating rate (default: [0.0]).',
+        'caps': 'The list of cap rates for the floating rate (default: []).',
+        'floors': 'The list of floor rates for the floating rate (default: []).',
+        'in_arrears': 'Whether the floating rate is in arrears (default: False).',
+        'issue_date': 'The issue date of the bond.',
+        'ex_coupon_period': 'The period for ex-coupon dates.',
+        'ex_coupon_calendar': 'The calendar for ex-coupon dates.',
+        'ex_coupon_convention': 'The business day convention for ex-coupon dates.',
+        'ex_coupon_end_of_month': 'Whether to adjust ex-coupon dates to the end of the month.',
+        'redemptions': 'The list of redemption amounts (default: [100.0]).',
+        'payment_lag': 'The lag for payment dates (default: 0).',
+    },
+    group=EXCEL_GROUP_NAME
+)
+def qlAmortizingFloatingRateBond(
+    settlement_days: int,
+    notional: list,
+    schedule: ql.Schedule,
+    index: ql.IborIndex,
+    accrual_day_counter: qDayCounter,
+    payment_convention: qBusinessDayConvention = ql.Following,
+    fixing_days: int = 0,
+    gearings: list = {1.0},
+    spreads: list = {0.0},
+    caps: list = {},
+    floors: list = {},
+    in_arrears: bool = False,
+    issue_date: qDate = ql.Date(),
+    ex_coupon_period: qPeriod = ql.Period(),
+    ex_coupon_calendar: qCalendar = ql.NullCalendar(),
+    ex_coupon_convention: qBusinessDayConvention = ql.Unadjusted,
+    ex_coupon_end_of_month: bool = False,
+    redemptions: list = {100.0},
+    payment_lag: int = 0,
+    trigger = None
+    ) -> ql.AmortizingFloatingRateBond:
+    return ql.AmortizingFloatingRateBond(
+        settlement_days,
+        notional,
+        schedule,
+        index,
+        accrual_day_counter,
+        payment_convention,
+        fixing_days,
+        gearings,
+        spreads,
+        caps,
+        floors,
+        in_arrears,
+        issue_date,
+        ex_coupon_period,
+        ex_coupon_calendar,
+        ex_coupon_convention,
+        ex_coupon_end_of_month,
+        redemptions,
+        payment_lag
+    )
+
+# ToDo test caps and floors parameters
+@xlo.func(
+    help='Create a QuantLib FloatingRateBond object.',
+    args={
+        'settlement_days': 'The number of settlement days after the trade date.',
+        'face_amount': 'The face amount of the bond.',
+        'schedule': 'The schedule for coupon payments.',
+        'index': 'The Ibor index for floating rate calculations.',
+        'payment_day_counter': 'The day counter for payment dates.',
+        'payment_convention': 'The business day convention for payment dates.',
+        'fixing_days': 'The number of days for fixing the rate (default: 0).',
+        'gearings': 'The list of gearings for the floating rate (default: [1.0]).',
+        'spreads': 'The list of spreads for the floating rate (default: [0.0]).',
+        'caps': 'The list of cap rates for the floating rate (default: []).',
+        'floors': 'The list of floor rates for the floating rate (default: []).',
+        'in_arrears': 'Whether the floating rate is in arrears (default: False).',
+        'redemption': 'The redemption amount (default: 100.0).',
+        'issue_date': 'The issue date of the bond.',
+        'ex_coupon_period': 'The period for ex-coupon dates.',
+        'ex_coupon_calendar': 'The calendar for ex-coupon dates.',
+        'ex_coupon_convention': 'The business day convention for ex-coupon dates.',
+        'ex_coupon_end_of_month': 'Whether to adjust ex-coupon dates to the end of the month.',
+    },
+    group=EXCEL_GROUP_NAME
+)
+def qlFloatingRateBond(
+        settlement_days: int,
+         face_amount: float,
+         schedule: ql.Schedule,
+         index: ql.IborIndex,
+         payment_day_counter: qDayCounter,
+         payment_convention: qBusinessDayConvention = ql.Following,
+         fixing_days: int = 0,
+         gearings: list = {1.0},
+         spreads: list = {0.0},
+         caps: list = {},
+         floors: list = {},
+         in_arrears: bool = False,
+         redemption: float = 100.0,
+         issue_date: qDate = ql.Date(),
+         ex_coupon_period: qPeriod = ql.Period(),
+         ex_coupon_calendar: qCalendar = ql.NullCalendar(),
+         ex_coupon_convention: qBusinessDayConvention = ql.Unadjusted,
+         ex_coupon_end_of_month: bool = False,
+         trigger = None
+    ) -> ql.FloatingRateBond:
+    return ql.FloatingRateBond(
+        settlement_days,
+        face_amount,
+        schedule,
+        index,
+        payment_day_counter,
+        payment_convention,
+        fixing_days,
+        gearings,
+        spreads,
+        caps,
+        floors,
+        in_arrears,
+        redemption,
+        issue_date,
+        ex_coupon_period,
+        ex_coupon_calendar,
+        ex_coupon_convention,
+        ex_coupon_end_of_month
+    )
+
+# ToDo test gearings parameter
+@xlo.func(
+    help='Create a QuantLib CmsRateBond object.',
+    args={
+        'settlement_days': 'The number of settlement days after the trade date.',
+        'face_amount': 'The face amount of the bond.',
+        'schedule': 'The schedule for coupon payments.',
+        'index': 'The swap index for CMS rate calculations.',
+        'payment_day_counter': 'The day counter for payment dates.',
+        'payment_convention': 'The business day convention for payment dates.',
+        'fixing_days': 'The number of days for fixing the rate.',
+        'gearings': 'The list of gearings for the CMS rate.',
+        'spreads': 'The list of spreads for the CMS rate.',
+        'caps': 'The list of cap rates for the CMS rate.',
+        'floors': 'The list of floor rates for the CMS rate.',
+        'in_arrears': 'Whether the CMS rate is in arrears (default: False).',
+        'redemption': 'The redemption amount (default: 100.0).',
+        'issue_date': 'The issue date of the bond.',
+    },
+    group=EXCEL_GROUP_NAME
+)
+def qlCmsRateBond(
+    settlement_days: int,
+    face_amount: float,
+    schedule: ql.Schedule,
+    index: ql.SwapIndex,
+    payment_day_counter: qDayCounter,
+    payment_convention: qBusinessDayConvention,
+    fixing_days: int,
+    gearings: list,
+    spreads: list,
+    caps: list,
+    floors: list,
+    in_arrears: bool = False,
+    redemption: float = 100.0,
+    issue_date: qDate = ql.Date(),
+    trigger = None
+    ) -> ql.CmsRateBond:
+       return ql.CmsRateBond(
+        settlement_days,
+        face_amount,
+        schedule,
+        index,
+        payment_day_counter,
+        payment_convention,
+        fixing_days,
+        gearings,
+        spreads,
+        caps,
+        floors,
+        in_arrears,
+        redemption,
+        issue_date
+       )
+
+# ToDo test gearings parameter
+@xlo.func(
+    help='Create a QuantLib AmortizingCmsRateBond object.',
+    args={
+        'settlement_days': 'The number of settlement days after the trade date.',
+        'notionals': 'The list of notional amounts for each period.',
+        'schedule': 'The schedule for coupon payments.',
+        'index': 'The swap index for CMS rate calculations.',
+        'payment_day_counter': 'The day counter for payment dates.',
+        'payment_convention': 'The business day convention for payment dates.',
+        'fixing_days': 'The number of days for fixing the rate.',
+        'gearings': 'The list of gearings for the CMS rate (default: [1.0]).',
+        'spreads': 'The list of spreads for the CMS rate (default: [0.0]).',
+        'caps': 'The list of cap rates for the CMS rate (default: []).',
+        'floors': 'The list of floor rates for the CMS rate (default: []).',
+        'in_arrears': 'Whether the CMS rate is in arrears (default: False).',
+        'issue_date': 'The issue date of the bond.',
+    },
+    group=EXCEL_GROUP_NAME
+)   
+def qlAmortizingCmsRateBond(
+        settlement_days: int,
+        notionals: list,
+        schedule: ql.Schedule,
+        index: ql.SwapIndex,
+        payment_day_counter: qDayCounter,
+        payment_convention: qBusinessDayConvention = ql.Following,
+        fixing_days: int = 0,
+        gearings: list = {0.0}, # gearings = {1.0}
+        spreads: list = {0.0},
+        caps: list = {},
+        floors: list = {},
+        in_arrears: bool = False,
+        issue_date: qDate = ql.Date(),
+        trigger = None
+    ) -> ql.AmortizingCmsRateBond:
+        return  ql.AmortizingCmsRateBond(
+            settlement_days,
+            notionals,
+            schedule,
+            index,
+            payment_day_counter,
+            payment_convention,
+            fixing_days,
+            gearings,
+            spreads,
+            caps,
+            floors,
+            in_arrears,
+            issue_date
+        )
+
+@xlo.func(
+    help='Set a discounting pricing engine on a bond using a yield term structure handle.',
+    args={
+        'bond': 'The bond object.',
+        'discount_curve': 'The discount curve (yield term structure handle).',
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlBondSetDiscountingEngine(
+    bond: ql.Bond,
+    discount_curve: ql.YieldTermStructureHandle,
+    trigger = None
+    ) -> ql.Bond:
+    bond.setPricingEngine(ql.DiscountingBondEngine(discount_curve))
+    return ql.DiscountingBondEngine(discount_curve)
