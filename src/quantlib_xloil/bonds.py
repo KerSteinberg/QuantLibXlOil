@@ -41,8 +41,8 @@ def qCallabilityType(callability_type: str) -> ql.Callability.Type:
     },
     group=EXCEL_GROUP_NAME,
     )
-def qlBondPrice(amount:float, price_type: str) -> ql.BondPrice:
-    return ql.BondPrice(amount, _qBondPriceType(price_type))
+def qlBondPrice(amount: float, price_type: qBondPriceType) -> ql.BondPrice:
+    return ql.BondPrice(amount, price_type)
 
 @xlo.func(
     help='Create a QuantLib Callability object from a bond price, callability type, and date.',
@@ -53,8 +53,8 @@ def qlBondPrice(amount:float, price_type: str) -> ql.BondPrice:
     },
     group=EXCEL_GROUP_NAME,
 )
-def qlCallability(price: qlBondPrice, callability_type: str, date: qDate, trigger = None) -> ql.Callability:
-    return ql.Callability(price, _qCallabilityType(callability_type), date)
+def qlCallability(price: qlBondPrice, callability_type: qCallabilityType, date: qDate, trigger = None) -> ql.Callability:
+    return ql.Callability(price, callability_type, date)
 
 # ToDo arg real trigger
 @xlo.func(
@@ -66,8 +66,8 @@ def qlCallability(price: qlBondPrice, callability_type: str, date: qDate, trigge
     },
     group=EXCEL_GROUP_NAME,
 )
-def qlSoftCallability(price: qlBondPrice, callability_type: str, date: qDate, trigger = None) -> ql.SoftCallability:
-    return ql.SoftCallability(price, _qCallabilityType(callability_type), date)
+def qlSoftCallability(price: qlBondPrice, callability_type: qCallabilityType, date: qDate, trigger = None) -> ql.SoftCallability:
+    return ql.SoftCallability(price, callability_type, date)
 
 @xlo.func(
     help='Convert a bond price type to its corresponding amount.',
@@ -76,18 +76,21 @@ def qlSoftCallability(price: qlBondPrice, callability_type: str, date: qDate, tr
     },
     group=EXCEL_GROUP_NAME,
 )
-def qlBondPriceAmount(price_type: ql.BondPrice, trigger = None) -> float:
+def qlBondPriceAmount(price_type: qlBondPrice, trigger = None) -> float:
     return price_type.amount()
 
 @xlo.func(
     help='Get the type of a bond price.',
     args={
-        'price_type': 'The bond price type (e.g., "CLEAN" or "DIRTY").',
+        'price_type': 'The bond price object.',
     },
     group=EXCEL_GROUP_NAME,
 )
-def qlBondPriceType(price_type: ql.BondPrice, trigger = None) -> str:
-    return price_type.type()
+def qlBondPriceType(price_type: qlBondPrice, trigger = None) -> str:
+    for key, value in QL_BOND_PRICE_TYPE.items():
+        if value == price_type.type():
+            return key
+    return UNKNOWN_VALUE
 
 @xlo.func(
     help='Check if a bond price type is valid.',
@@ -96,7 +99,7 @@ def qlBondPriceType(price_type: ql.BondPrice, trigger = None) -> str:
     },
     group=EXCEL_GROUP_NAME,
 )
-def qlBondPriceIsValid(price_type: ql.BondPrice, trigger = None) -> bool:
+def qlBondPriceIsValid(price_type: qlBondPrice, trigger = None) -> bool:
     return price_type.isValid()
 
 @xlo.func(
@@ -106,7 +109,7 @@ def qlBondPriceIsValid(price_type: ql.BondPrice, trigger = None) -> bool:
     },
     group=EXCEL_GROUP_NAME,
 )
-def qlCallabilityPrice(callability: ql.Callability, trigger = None) -> ql.BondPrice:
+def qlCallabilityPrice(callability: qlCallability, trigger = None) -> ql.BondPrice:
     return callability.price()
 
 @xlo.func(
@@ -116,8 +119,11 @@ def qlCallabilityPrice(callability: ql.Callability, trigger = None) -> ql.BondPr
     },
     group=EXCEL_GROUP_NAME,
 )
-def qlCallabilityType(callability: ql.Callability, trigger = None) -> str:
-    return callability.type()
+def qlCallabilityType(callability: qlCallability, trigger = None) -> str:
+    for key, value in QL_CALLABILITY_TYPE.items():
+        if value == callability.type():
+            return key
+    return UNKNOWN_VALUE
 
 @xlo.func(
     help='Get the date of a callability.',
@@ -126,7 +132,7 @@ def qlCallabilityType(callability: ql.Callability, trigger = None) -> str:
     },
     group=EXCEL_GROUP_NAME,
 )
-def qlCallabilityDate(callability: ql.Callability, trigger = None) -> ql.Date:
+def qlCallabilityDate(callability: qlCallability, trigger = None) -> ql.Date:
     return callability.date()   
 
 @xlo.func(
@@ -497,7 +503,7 @@ def qlBondYield2(
         trigger = None   
     ) -> float:
     return bond.bondYield(
-        ql.BondPrice(price, ql.BondPrice.Dirty),
+        price,
         dc, 
         compounding, 
         freq, 
