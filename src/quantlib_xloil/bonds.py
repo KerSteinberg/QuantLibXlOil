@@ -19,20 +19,20 @@ QL_CALLABILITY_TYPE = {
     "PUT": ql.Callability.Put,
 }
 
-def _qBondPriceType(price_type: str) -> ql.BondPrice:
-    return enum_value(price_type, QL_BOND_PRICE_TYPE)
+def _qBondPriceType(bond_price_type: str) -> ql.BondPrice:
+    return enum_value(bond_price_type, QL_BOND_PRICE_TYPE)
 
 def _qCallabilityType(callability_type: str) -> ql.Callability.Type:
     return enum_value(callability_type, QL_CALLABILITY_TYPE)    
 
 @xlo.converter()
-def qBondPriceType(price_type: str) -> ql.BondPrice:
-    return _qBondPriceType(price_type)
+def qBondPriceType(bond_price_type: str) -> ql.BondPrice:
+    return _qBondPriceType(bond_price_type)
 
 @xlo.converter()
 def qCallabilityType(callability_type: str) -> ql.Callability.Type:
     return _qCallabilityType(callability_type)
-  
+
 @xlo.func(
     help='Create a QuantLib BondPrice object from an amount and price type.',
     args={
@@ -41,8 +41,8 @@ def qCallabilityType(callability_type: str) -> ql.Callability.Type:
     },
     group=EXCEL_GROUP_NAME,
     )
-def qlBondPrice(amount: float, price_type: qBondPriceType) -> ql.BondPrice:
-    return ql.BondPrice(amount, price_type)
+def qlBondPrice(amount: float, type: qBondPriceType) -> ql.BondPrice:
+    return ql.BondPrice(amount, type)
 
 @xlo.func(
     help='Create a QuantLib Callability object from a bond price, callability type, and date.',
@@ -53,8 +53,8 @@ def qlBondPrice(amount: float, price_type: qBondPriceType) -> ql.BondPrice:
     },
     group=EXCEL_GROUP_NAME,
 )
-def qlCallability(price: qlBondPrice, callability_type: qCallabilityType, date: qDate, trigger = None) -> ql.Callability:
-    return ql.Callability(price, callability_type, date)
+def qlCallability(price: ql.BondPrice, type: qCallabilityType, date: qDate, trigger = None) -> ql.Callability:
+    return ql.Callability(price, type, date)
 
 # ToDo arg real trigger
 @xlo.func(
@@ -66,8 +66,8 @@ def qlCallability(price: qlBondPrice, callability_type: qCallabilityType, date: 
     },
     group=EXCEL_GROUP_NAME,
 )
-def qlSoftCallability(price: qlBondPrice, callability_type: qCallabilityType, date: qDate, trigger = None) -> ql.SoftCallability:
-    return ql.SoftCallability(price, callability_type, date)
+def qlSoftCallability(price: ql.BondPrice, type: qCallabilityType, date: qDate, trigger = None) -> ql.SoftCallability:
+    return ql.SoftCallability(price, type, date)
 
 @xlo.func(
     help='Convert a bond price type to its corresponding amount.',
@@ -76,9 +76,10 @@ def qlSoftCallability(price: qlBondPrice, callability_type: qCallabilityType, da
     },
     group=EXCEL_GROUP_NAME,
 )
-def qlBondPriceAmount(price_type: qlBondPrice, trigger = None) -> float:
-    return price_type.amount()
+def qlBondPriceAmount(bond_price: ql.BondPrice, trigger = None) -> float:
+    return bond_price.amount()
 
+# ToDo get type object in python and type name in excel
 @xlo.func(
     help='Get the type of a bond price.',
     args={
@@ -86,9 +87,9 @@ def qlBondPriceAmount(price_type: qlBondPrice, trigger = None) -> float:
     },
     group=EXCEL_GROUP_NAME,
 )
-def qlBondPriceType(price_type: qlBondPrice, trigger = None) -> str:
+def qlBondPriceType(bond_price: ql.BondPrice, trigger = None) -> str:
     for key, value in QL_BOND_PRICE_TYPE.items():
-        if value == price_type.type():
+        if value == bond_price.type():
             return key
     return UNKNOWN_VALUE
 
@@ -99,8 +100,8 @@ def qlBondPriceType(price_type: qlBondPrice, trigger = None) -> str:
     },
     group=EXCEL_GROUP_NAME,
 )
-def qlBondPriceIsValid(price_type: qlBondPrice, trigger = None) -> bool:
-    return price_type.isValid()
+def qlBondPriceIsValid(bond_price: ql.BondPrice, trigger = None) -> bool:
+    return bond_price.isValid()
 
 @xlo.func(
     help='Get the price of a callability.',
@@ -109,9 +110,10 @@ def qlBondPriceIsValid(price_type: qlBondPrice, trigger = None) -> bool:
     },
     group=EXCEL_GROUP_NAME,
 )
-def qlCallabilityPrice(callability: qlCallability, trigger = None) -> ql.BondPrice:
+def qlCallabilityPrice(callability: ql.Callability, trigger = None) -> ql.BondPrice:
     return callability.price()
 
+# ToDo get type object in python and type name in excel
 @xlo.func(
     help='Get the type of a callability.',
     args={
@@ -119,7 +121,7 @@ def qlCallabilityPrice(callability: qlCallability, trigger = None) -> ql.BondPri
     },
     group=EXCEL_GROUP_NAME,
 )
-def qlCallabilityType(callability: qlCallability, trigger = None) -> str:
+def qlCallabilityType(callability: ql.Callability, trigger = None) -> str:
     for key, value in QL_CALLABILITY_TYPE.items():
         if value == callability.type():
             return key
@@ -132,7 +134,7 @@ def qlCallabilityType(callability: qlCallability, trigger = None) -> str:
     },
     group=EXCEL_GROUP_NAME,
 )
-def qlCallabilityDate(callability: qlCallability, trigger = None) -> ql.Date:
+def qlCallabilityDate(callability: ql.Callability, trigger = None) -> ql.Date:
     return callability.date()   
 
 @xlo.func(
@@ -492,7 +494,7 @@ def qlBondYield(
 )
 def qlBondYield2(
         bond: ql.Bond, 
-        price: qlBondPrice,
+        price: ql.BondPrice,
         dc: qDayCounter, 
         compounding: qCompounding, 
         freq: qFrequency,
