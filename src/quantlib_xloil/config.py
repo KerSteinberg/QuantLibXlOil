@@ -1,2 +1,1 @@
-
 EXCEL_GROUP_NAME = "QuantLibXLOIL"

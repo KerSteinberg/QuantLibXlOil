@@ -1,23 +1,24 @@
 import QuantLib as ql
 import xloil as xlo
 
+from .calendars import qCalendar
 from .config import EXCEL_GROUP_NAME
 from .date import qDate
-from .calendars import qCalendar
 from .daycounters import qDayCounter
-from .utilities import first_key, UNKNOWN_KEY, UNKNOWN_VALUE, enum_value
-
+from .utilities import enum_value, UNKNOWN_KEY, UNKNOWN_VALUE
 
 # Volatility types
 
 QL_VOLATILITY_TYPE = {
-    'NORMAL' : ql.Normal,
-    'SHIFTEDLOGNORMAL' : ql.ShiftedLognormal,
-    UNKNOWN_KEY : UNKNOWN_VALUE,
+    "NORMAL": ql.Normal,
+    "SHIFTEDLOGNORMAL": ql.ShiftedLognormal,
+    UNKNOWN_KEY: UNKNOWN_VALUE,
 }
+
 
 def _qVolatilityType(s: str) -> int:
     return enum_value(s, QL_VOLATILITY_TYPE)
+
 
 @xlo.converter()
 def qVolatilityType(s: str) -> int:
@@ -26,31 +27,27 @@ def qVolatilityType(s: str) -> int:
 
 # VolatilityTermStructure/BlackVolTermStructure interface
 
+
 @xlo.func(
     help="Returns the minimum strike for which the volatility is defined.",
-    args={
-        "vol_tsh": "Handle to a BlackVolTermStructure object."
-    },
-    group=EXCEL_GROUP_NAME
+    args={"vol_tsh": "Handle to a BlackVolTermStructure object."},
+    group=EXCEL_GROUP_NAME,
 )
 def qlBlackVolTermStructureMinStrike(
-    vol_tsh : ql.BlackVolTermStructureHandle,
-    trigger=None
-    ) -> float:
+    vol_tsh: ql.BlackVolTermStructureHandle, trigger=None
+) -> float:
     #
     return vol_tsh.minStrike()
 
+
 @xlo.func(
     help="Returns the maximum strike for which the volatility is defined.",
-    args={
-        "vol_tsh": "Handle to a BlackVolTermStructure object."
-    },
-    group=EXCEL_GROUP_NAME
+    args={"vol_tsh": "Handle to a BlackVolTermStructure object."},
+    group=EXCEL_GROUP_NAME,
 )
 def qlBlackVolTermStructureMaxStrike(
-    vol_tsh : ql.BlackVolTermStructureHandle,
-    trigger=None
-    ) -> float:
+    vol_tsh: ql.BlackVolTermStructureHandle, trigger=None
+) -> float:
     #
     return vol_tsh.maxStrike()
 
@@ -63,17 +60,18 @@ def qlBlackVolTermStructureMaxStrike(
         "strike": "Option strike price.",
         "extrapolate": "Whether to extrapolate if the strike is outside the defined range.",
     },
-    group=EXCEL_GROUP_NAME
+    group=EXCEL_GROUP_NAME,
 )
 def qlBlackVolTermStructureBlackVol(
-    vol_tsh : ql.BlackVolTermStructureHandle,
-    expiry_date : qDate,
-    strike : float,
-    extrapolate : bool = False,
+    vol_tsh: ql.BlackVolTermStructureHandle,
+    expiry_date: qDate,
+    strike: float,
+    extrapolate: bool = False,
     trigger=None,
-    ) -> float:
+) -> float:
     #
     return vol_tsh.blackVol(expiry_date, strike, extrapolate)
+
 
 @xlo.func(
     help="Returns the Black volatility for a given expiry time and strike.",
@@ -83,17 +81,18 @@ def qlBlackVolTermStructureBlackVol(
         "strike": "Option strike price.",
         "extrapolate": "Whether to extrapolate if the strike is outside the defined range.",
     },
-    group=EXCEL_GROUP_NAME
+    group=EXCEL_GROUP_NAME,
 )
 def qlBlackVolTermStructureBlackVolFromTime(
-    vol_tsh : ql.BlackVolTermStructureHandle,
-    expiry_time : float,
-    strike : float,
-    extrapolate : bool = False,
+    vol_tsh: ql.BlackVolTermStructureHandle,
+    expiry_time: float,
+    strike: float,
+    extrapolate: bool = False,
     trigger=None,
-    ) -> float:
+) -> float:
     #
     return vol_tsh.blackVol(expiry_time, strike, extrapolate)
+
 
 @xlo.func(
     help="Returns the Black variance for a given expiry and strike.",
@@ -103,17 +102,18 @@ def qlBlackVolTermStructureBlackVolFromTime(
         "strike": "Option strike price.",
         "extrapolate": "Whether to extrapolate if the strike is outside the defined range.",
     },
-    group=EXCEL_GROUP_NAME
+    group=EXCEL_GROUP_NAME,
 )
 def qlBlackVolTermStructureBlackVariance(
-    vol_tsh : ql.BlackVolTermStructureHandle,
-    expiry_date : qDate,
-    strike : float,
-    extrapolate : bool = False,
+    vol_tsh: ql.BlackVolTermStructureHandle,
+    expiry_date: qDate,
+    strike: float,
+    extrapolate: bool = False,
     trigger=None,
-    ) -> float:
+) -> float:
     #
     return vol_tsh.blackVariance(expiry_date, strike, extrapolate)
+
 
 @xlo.func(
     help="Returns the Black variance for a given expiry time and strike.",
@@ -123,17 +123,18 @@ def qlBlackVolTermStructureBlackVariance(
         "strike": "Option strike price.",
         "extrapolate": "Whether to extrapolate if the strike is outside the defined range.",
     },
-    group=EXCEL_GROUP_NAME
+    group=EXCEL_GROUP_NAME,
 )
 def qlBlackVolTermStructureBlackVarianceFromTime(
-    vol_tsh : ql.BlackVolTermStructureHandle,
-    expiry_time : float,
-    strike : float,
-    extrapolate : bool = False,
+    vol_tsh: ql.BlackVolTermStructureHandle,
+    expiry_time: float,
+    strike: float,
+    extrapolate: bool = False,
     trigger=None,
-    ) -> float:
+) -> float:
     #
     return vol_tsh.blackVariance(expiry_time, strike, extrapolate)
+
 
 @xlo.func(
     help="Returns the Black forward volatility for a given start and end date and strike.",
@@ -144,18 +145,19 @@ def qlBlackVolTermStructureBlackVarianceFromTime(
         "strike": "Option strike price.",
         "extrapolate": "Whether to extrapolate if the strike is outside the defined range.",
     },
-    group=EXCEL_GROUP_NAME
+    group=EXCEL_GROUP_NAME,
 )
 def qlBlackVolTermStructureBlackForwardVol(
-    vol_tsh : ql.BlackVolTermStructureHandle,
-    date_start : qDate,
-    date_end : qDate,
-    strike : float,
-    extrapolate : bool = False,
+    vol_tsh: ql.BlackVolTermStructureHandle,
+    date_start: qDate,
+    date_end: qDate,
+    strike: float,
+    extrapolate: bool = False,
     trigger=None,
-    ) -> float:
+) -> float:
     #
     return vol_tsh.blackForwardVol(date_start, date_end, strike, extrapolate)
+
 
 @xlo.func(
     help="Returns the Black forward volatility for a given start and end time and strike.",
@@ -166,18 +168,19 @@ def qlBlackVolTermStructureBlackForwardVol(
         "strike": "Option strike price.",
         "extrapolate": "Whether to extrapolate if the strike is outside the defined range.",
     },
-    group=EXCEL_GROUP_NAME
+    group=EXCEL_GROUP_NAME,
 )
 def qlBlackVolTermStructureBlackForwardVolFromTime(
-    vol_tsh : ql.BlackVolTermStructureHandle,
-    time_start : float,
-    time_end : float,
-    strike : float,
-    extrapolate : bool = False,
+    vol_tsh: ql.BlackVolTermStructureHandle,
+    time_start: float,
+    time_end: float,
+    strike: float,
+    extrapolate: bool = False,
     trigger=None,
-    ) -> float:
+) -> float:
     #
     return vol_tsh.blackForwardVol(time_start, time_end, strike, extrapolate)
+
 
 @xlo.func(
     help="Returns the Black forward variance for a given start and end date and strike.",
@@ -188,18 +191,19 @@ def qlBlackVolTermStructureBlackForwardVolFromTime(
         "strike": "Option strike price.",
         "extrapolate": "Whether to extrapolate if the strike is outside the defined range.",
     },
-    group=EXCEL_GROUP_NAME
+    group=EXCEL_GROUP_NAME,
 )
 def qlBlackVolTermStructureBlackForwardVariance(
-    vol_tsh : ql.BlackVolTermStructureHandle,
-    date_start : qDate,
-    date_end : qDate,
-    strike : float,
-    extrapolate : bool = False,
+    vol_tsh: ql.BlackVolTermStructureHandle,
+    date_start: qDate,
+    date_end: qDate,
+    strike: float,
+    extrapolate: bool = False,
     trigger=None,
-    ) -> float:
+) -> float:
     #
     return vol_tsh.blackForwardVariance(date_start, date_end, strike, extrapolate)
+
 
 @xlo.func(
     help="Returns the Black forward variance for a given start and end time and strike.",
@@ -210,16 +214,16 @@ def qlBlackVolTermStructureBlackForwardVariance(
         "strike": "Option strike price.",
         "extrapolate": "Whether to extrapolate if the strike is outside the defined range.",
     },
-    group=EXCEL_GROUP_NAME
+    group=EXCEL_GROUP_NAME,
 )
 def qlBlackVolTermStructureBlackForwardVarianceFromTime(
-    vol_tsh : ql.BlackVolTermStructureHandle,
-    time_start : float,
-    time_end : float,
-    strike : float,
-    extrapolate : bool = False,
+    vol_tsh: ql.BlackVolTermStructureHandle,
+    time_start: float,
+    time_end: float,
+    strike: float,
+    extrapolate: bool = False,
     trigger=None,
-    ) -> float:
+) -> float:
     #
     return vol_tsh.blackForwardVariance(time_start, time_end, strike, extrapolate)
 
@@ -232,21 +236,22 @@ def qlBlackVolTermStructureBlackForwardVarianceFromTime(
         "volatility": "Constant volatility value.",
         "day_counter": "Day count convention for the volatility.",
     },
-    group=EXCEL_GROUP_NAME
+    group=EXCEL_GROUP_NAME,
 )
 def qlBlackConstantVol(
-    reference_date : qDate,
-    calendar : qCalendar,
-    volatility : float,
-    day_counter : qDayCounter,
+    reference_date: qDate,
+    calendar: qCalendar,
+    volatility: float,
+    day_counter: qDayCounter,
     trigger=None,
-    ) -> ql.BlackVolTermStructureHandle:
+) -> ql.BlackVolTermStructureHandle:
     #
     volts = ql.BlackConstantVol(reference_date, calendar, volatility, day_counter)
     return ql.BlackVolTermStructureHandle(volts)
 
 
 # LocalVolTermStructure interface
+
 
 @xlo.func(
     help="Returns the local volatility for a given expiry date and strike.",
@@ -256,17 +261,18 @@ def qlBlackConstantVol(
         "strike": "Option strike price.",
         "extrapolate": "Whether to extrapolate if the strike is outside the defined range.",
     },
-    group=EXCEL_GROUP_NAME
+    group=EXCEL_GROUP_NAME,
 )
 def qlLocalVolTermStructureLocalVol(
-    vol_tsh : ql.LocalVolTermStructureHandle,
-    expiry_date : qDate,
-    strike : float,
-    extrapolate : bool = False,
+    vol_tsh: ql.LocalVolTermStructureHandle,
+    expiry_date: qDate,
+    strike: float,
+    extrapolate: bool = False,
     trigger=None,
-    ) -> float:
+) -> float:
     #
     return vol_tsh.localVol(expiry_date, strike, extrapolate)
+
 
 @xlo.func(
     help="Returns the local volatility for a given expiry time and strike.",
@@ -276,14 +282,14 @@ def qlLocalVolTermStructureLocalVol(
         "strike": "Option strike price.",
         "extrapolate": "Whether to extrapolate if the strike is outside the defined range.",
     },
-    group=EXCEL_GROUP_NAME
+    group=EXCEL_GROUP_NAME,
 )
 def qlLocalVolTermStructureLocalVolFromTime(
-    vol_tsh : ql.LocalVolTermStructureHandle,
-    expiry_time : float,
-    strike : float,
-    extrapolate : bool = False,
+    vol_tsh: ql.LocalVolTermStructureHandle,
+    expiry_time: float,
+    strike: float,
+    extrapolate: bool = False,
     trigger=None,
-    ) -> float:
+) -> float:
     #
     return vol_tsh.localVol(expiry_time, strike, extrapolate)

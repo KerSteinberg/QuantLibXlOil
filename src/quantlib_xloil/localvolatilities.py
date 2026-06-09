@@ -2,11 +2,25 @@ import QuantLib as ql
 import xloil as xlo
 
 from .config import EXCEL_GROUP_NAME
-from .date import qDate
+from .date import qDate, _to_date_list
 from .daycounters import qDayCounter
 from .ratehelpers import qQuoteHandle
-from .stochasticprocess import _to_float_matrix
-from .utilities import enum_value, first_key, UNKNOWN_KEY, UNKNOWN_VALUE
+from .utilities import (
+    enum_value,
+    to_float_list,
+    to_float_matrix,
+    UNKNOWN_KEY,
+    UNKNOWN_VALUE,
+)
+
+
+def _qFixedLocalVolSurfaceExtrapolation(s: str) -> int:
+    return enum_value(s, QL_FIXEDLOCALVOL_SURFACE_EXTRAPOLATION)
+
+
+@xlo.converter()
+def qFixedLocalVolSurfaceExtrapolation(s: str) -> int:
+    return _qFixedLocalVolSurfaceExtrapolation(s)
 
 
 @xlo.func(
@@ -45,7 +59,9 @@ def qlLocalVolSurface(
     underlying: qQuoteHandle,
     trigger=None,
 ) -> ql.LocalVolTermStructureHandle:
-    local_vol_surface = ql.LocalVolSurface(black_vol_tsh, risk_free_ytsh, dividend_ytsh, underlying)
+    local_vol_surface = ql.LocalVolSurface(
+        black_vol_tsh, risk_free_ytsh, dividend_ytsh, underlying
+    )
     return ql.LocalVolTermStructureHandle(local_vol_surface)
 
 
@@ -68,22 +84,21 @@ def qlNoExceptLocalVolSurface(
     illegal_local_vol_overwrite: float,
     trigger=None,
 ) -> ql.LocalVolTermStructureHandle:
-    local_vol_surface = ql.NoExceptLocalVolSurface(black_vol_tsh, risk_free_ytsh, dividend_ytsh, underlying, illegal_local_vol_overwrite)
+    local_vol_surface = ql.NoExceptLocalVolSurface(
+        black_vol_tsh,
+        risk_free_ytsh,
+        dividend_ytsh,
+        underlying,
+        illegal_local_vol_overwrite,
+    )
     return ql.LocalVolTermStructureHandle(local_vol_surface)
 
 
 QL_FIXEDLOCALVOL_SURFACE_EXTRAPOLATION = {
-    'CONSTANT': ql.FixedLocalVolSurface.ConstantExtrapolation,
-    'DEFAULT': ql.FixedLocalVolSurface.InterpolatorDefaultExtrapolation,
+    "CONSTANT": ql.FixedLocalVolSurface.ConstantExtrapolation,
+    "DEFAULT": ql.FixedLocalVolSurface.InterpolatorDefaultExtrapolation,
     UNKNOWN_KEY: UNKNOWN_VALUE,
 }
-
-def _qFixedLocalVolSurfaceExtrapolation(s: str) -> int:
-    return enum_value(s, QL_FIXEDLOCALVOL_SURFACE_EXTRAPOLATION)
-
-@xlo.converter()
-def qFixedLocalVolSurfaceExtrapolation(s: str) -> int:
-    return _qFixedLocalVolSurfaceExtrapolation(s)
 
 
 @xlo.func(
@@ -110,13 +125,11 @@ def qlFixedLocalVolSurface(
     upperExtrapolation: qFixedLocalVolSurfaceExtrapolation = ql.FixedLocalVolSurface.ConstantExtrapolation,
     trigger=None,
 ) -> ql.LocalVolTermStructureHandle:
-    _dates = [ ql.Date(round(d)) for d in dates ]
-    _strikes = [ float(s) for s in strikes ]
-    _local_vol_matrix = ql.Matrix(_to_float_matrix(local_vol_matrix))
+    _local_vol_matrix = ql.Matrix(to_float_matrix(local_vol_matrix))
     local_vol_surface = ql.FixedLocalVolSurface(
         reference_date,
-        _dates,
-        _strikes,
+        _to_date_list(dates),
+        to_float_list(strikes),
         _local_vol_matrix,
         day_counter,
         lowerExtrapolation,

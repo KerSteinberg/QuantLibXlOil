@@ -1,8 +1,9 @@
 import QuantLib as ql
 import pytest
 
-from quantlib_xloil import (
-    qlBlackConstantVol,
+from quantlib_xloil.stochasticprocess import (
+    qGJRGARCHProcessDiscretization,
+    qHestonProcessDiscretization,
     qlBlackScholesProcess,
     qlBlackScholesMertonProcess,
     qlBlackProcess,
@@ -65,20 +66,15 @@ from quantlib_xloil import (
     qlStochasticProcess1DVariance,
     qlStochasticProcess1DX0,
     qlVarianceGammaProcess,
-    qlYieldTermStructureHandle,
 )
-
-from quantlib_xloil.stochasticprocess import (
-    _qGJRGARCHProcessDiscretization,
-    _qHestonProcessDiscretization,
-)
-
-from quantlib_xloil.daycounters import qDayCounter
-from quantlib_xloil.calendars import qCalendar
+from quantlib_xloil.piecewiseyieldcurve import qlYieldTermStructureHandle
+from quantlib_xloil.volatilities import qlBlackConstantVol
 
 
 def _curve(reference_date: ql.Date, rate: float = 0.05) -> ql.YieldTermStructureHandle:
-    return qlYieldTermStructureHandle(ql.FlatForward(reference_date, rate, ql.Actual365Fixed()))
+    return qlYieldTermStructureHandle(
+        ql.FlatForward(reference_date, rate, ql.Actual365Fixed())
+    )
 
 
 def _quote(value: float) -> ql.QuoteHandle:
@@ -126,22 +122,53 @@ def test_generalized_black_scholes_family_wrappers():
     risk_free = _curve(reference_date, 0.03)
     dividend = _curve(reference_date, 0.01)
     vol = qlBlackConstantVol(reference_date, calendar, 0.20, day_counter)
-    local_vol = ql.LocalVolTermStructureHandle(ql.LocalConstantVol(reference_date, 0.25, day_counter))
+    local_vol = ql.LocalVolTermStructureHandle(
+        ql.LocalConstantVol(reference_date, 0.25, day_counter)
+    )
     s0 = _quote(100.0)
 
     gbsm = qlGeneralizedBlackScholesProcess(s0, dividend, risk_free, vol, local_vol)
     assert qlGeneralizedBlackScholesProcessStateVariable(gbsm).value() == 100.0
-    assert qlGeneralizedBlackScholesProcessDividendYield(gbsm).discount(reference_date) == dividend.discount(reference_date)
-    assert qlGeneralizedBlackScholesProcessRiskFreeRate(gbsm).discount(reference_date) == risk_free.discount(reference_date)
-    assert qlGeneralizedBlackScholesProcessBlackVolatility(gbsm).blackVol(reference_date, 100.0) == 0.20
+    assert qlGeneralizedBlackScholesProcessDividendYield(gbsm).discount(
+        reference_date
+    ) == dividend.discount(reference_date)
+    assert qlGeneralizedBlackScholesProcessRiskFreeRate(gbsm).discount(
+        reference_date
+    ) == risk_free.discount(reference_date)
+    assert (
+        qlGeneralizedBlackScholesProcessBlackVolatility(gbsm).blackVol(
+            reference_date, 100.0
+        )
+        == 0.20
+    )
     assert qlGeneralizedBlackScholesProcessLocalVolatility(gbsm) is not None
 
     assert qlStochasticProcess1DX0(qlBlackScholesProcess(s0, risk_free, vol)) == 100.0
-    assert qlStochasticProcess1DX0(qlBlackScholesMertonProcess(s0, dividend, risk_free, vol)) == 100.0
+    assert (
+        qlStochasticProcess1DX0(
+            qlBlackScholesMertonProcess(s0, dividend, risk_free, vol)
+        )
+        == 100.0
+    )
     assert qlStochasticProcess1DX0(qlBlackProcess(s0, risk_free, vol)) == 100.0
-    assert qlStochasticProcess1DX0(qlGarmanKohlagenProcess(s0, dividend, risk_free, vol)) == 100.0
-    assert qlStochasticProcess1DX0(qlVarianceGammaProcess(s0, dividend, risk_free, 0.2, 0.3, -0.1)) == 100.0
-    assert qlStochasticProcess1DX0(qlMerton76Process(s0, dividend, risk_free, vol, _quote(0.1), _quote(-0.05), _quote(0.2))) == 100.0
+    assert (
+        qlStochasticProcess1DX0(qlGarmanKohlagenProcess(s0, dividend, risk_free, vol))
+        == 100.0
+    )
+    assert (
+        qlStochasticProcess1DX0(
+            qlVarianceGammaProcess(s0, dividend, risk_free, 0.2, 0.3, -0.1)
+        )
+        == 100.0
+    )
+    assert (
+        qlStochasticProcess1DX0(
+            qlMerton76Process(
+                s0, dividend, risk_free, vol, _quote(0.1), _quote(-0.05), _quote(0.2)
+            )
+        )
+        == 100.0
+    )
 
 
 def test_heston_bates_and_gjrgarch_wrappers():
@@ -159,14 +186,20 @@ def test_heston_bates_and_gjrgarch_wrappers():
         0.04,
         0.30,
         -0.7,
-        _qHestonProcessDiscretization("quadraticexponentialmartingale"),
+        qHestonProcessDiscretization.__wrapped__("quadraticexponentialmartingale"),
     )
     assert qlHestonProcessS0(heston).value() == 100.0
-    assert qlHestonProcessDividendYield(heston).discount(reference_date) == dividend.discount(reference_date)
-    assert qlHestonProcessRiskFreeRate(heston).discount(reference_date) == risk_free.discount(reference_date)
+    assert qlHestonProcessDividendYield(heston).discount(
+        reference_date
+    ) == dividend.discount(reference_date)
+    assert qlHestonProcessRiskFreeRate(heston).discount(
+        reference_date
+    ) == risk_free.discount(reference_date)
     assert qlStochasticProcessSize(heston) == 2
 
-    bates = qlBatesProcess(risk_free, dividend, s0, 0.04, 1.5, 0.04, 0.30, -0.7, 0.10, -0.05, 0.20)
+    bates = qlBatesProcess(
+        risk_free, dividend, s0, 0.04, 1.5, 0.04, 0.30, -0.7, 0.10, -0.05, 0.20
+    )
     assert qlHestonProcessS0(bates).value() == 100.0
 
     gjr = qlGJRGARCHProcess(
@@ -181,9 +214,16 @@ def test_heston_bates_and_gjrgarch_wrappers():
         0.20,
     )
     assert qlGJRGARCHProcessS0(gjr).value() == 100.0
-    assert qlGJRGARCHProcessDividendYield(gjr).discount(reference_date) == dividend.discount(reference_date)
-    assert qlGJRGARCHProcessRiskFreeRate(gjr).discount(reference_date) == risk_free.discount(reference_date)
-    assert _qGJRGARCHProcessDiscretization("fulltruncation") == ql.GJRGARCHProcess.FullTruncation
+    assert qlGJRGARCHProcessDividendYield(gjr).discount(
+        reference_date
+    ) == dividend.discount(reference_date)
+    assert qlGJRGARCHProcessRiskFreeRate(gjr).discount(
+        reference_date
+    ) == risk_free.discount(reference_date)
+    assert (
+        qGJRGARCHProcessDiscretization.__wrapped__("fulltruncation")
+        == ql.GJRGARCHProcess.FullTruncation
+    )
 
 
 def test_forward_and_gsr_process_wrappers():
