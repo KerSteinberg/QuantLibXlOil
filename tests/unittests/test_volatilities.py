@@ -1,7 +1,7 @@
 import pytest
 import QuantLib as ql
 
-from quantlib_xloil import (
+from quantlib_xloil.volatilities import (
     qlBlackConstantVol,
     qlBlackVolTermStructureBlackForwardVariance,
     qlBlackVolTermStructureBlackForwardVarianceFromTime,
@@ -13,13 +13,12 @@ from quantlib_xloil import (
     qlBlackVolTermStructureBlackVolFromTime,
     qlBlackVolTermStructureMaxStrike,
     qlBlackVolTermStructureMinStrike,
-    qlCalendar,
-    qlDate,
-    qlDayCounter,
-    qlDayCounterYearFraction,
     qlLocalVolTermStructureLocalVol,
     qlLocalVolTermStructureLocalVolFromTime,
 )
+from quantlib_xloil.calendars import qlCalendar
+from quantlib_xloil.date import qlDate
+from quantlib_xloil.daycounters import qlDayCounter, qlDayCounterYearFraction
 
 
 def _constant_vol_handle(volatility: float = 0.20):
@@ -66,7 +65,9 @@ def test_qlBlackVolTermStructure_black_variance_for_time_and_date():
     expected_t_date = qlDayCounterYearFraction(day_counter, reference_date, expiry_date)
 
     assert variance_by_time == pytest.approx((volatility * volatility) * t)
-    assert variance_by_date == pytest.approx((volatility * volatility) * expected_t_date)
+    assert variance_by_date == pytest.approx(
+        (volatility * volatility) * expected_t_date
+    )
 
 
 def test_qlBlackVolTermStructure_forward_vol_is_constant_for_date_and_time():
@@ -80,7 +81,9 @@ def test_qlBlackVolTermStructure_forward_vol_is_constant_for_date_and_time():
         qlDate(2025, 1, 2),
         strike,
     )
-    forward_vol_by_time = qlBlackVolTermStructureBlackForwardVolFromTime(handle, 0.5, 1.0, strike)
+    forward_vol_by_time = qlBlackVolTermStructureBlackForwardVolFromTime(
+        handle, 0.5, 1.0, strike
+    )
 
     assert forward_vol_by_date == pytest.approx(volatility)
     assert forward_vol_by_time == pytest.approx(volatility)
@@ -94,7 +97,9 @@ def test_qlBlackVolTermStructure_forward_variance_matches_elapsed_time():
     start_date = qlDate(2024, 7, 2)
     end_date = qlDate(2025, 1, 2)
 
-    forward_variance_by_time = qlBlackVolTermStructureBlackForwardVarianceFromTime(handle, 0.5, 1.5, strike)
+    forward_variance_by_time = qlBlackVolTermStructureBlackForwardVarianceFromTime(
+        handle, 0.5, 1.5, strike
+    )
     forward_variance_by_date = qlBlackVolTermStructureBlackForwardVariance(
         handle,
         start_date,
@@ -104,12 +109,18 @@ def test_qlBlackVolTermStructure_forward_variance_matches_elapsed_time():
     expected_forward_t = qlDayCounterYearFraction(day_counter, start_date, end_date)
 
     assert forward_variance_by_time == pytest.approx((volatility * volatility) * 1.0)
-    assert forward_variance_by_date == pytest.approx((volatility * volatility) * expected_forward_t)
+    assert forward_variance_by_date == pytest.approx(
+        (volatility * volatility) * expected_forward_t
+    )
 
 
 def test_qlLocalVolTermStructure_interface():
     lvol = ql.LocalConstantVol(qlDate(2024, 1, 2), 0.25, qlDayCounter("ACTUAL365FIXED"))
     lvol_handle = ql.LocalVolTermStructureHandle(lvol)
 
-    assert qlLocalVolTermStructureLocalVol(lvol_handle, qlDate(2024, 7, 2), 100.0) == pytest.approx(0.25)
-    assert qlLocalVolTermStructureLocalVolFromTime(lvol_handle, 0.5, 100.0) == pytest.approx(0.25)
+    assert qlLocalVolTermStructureLocalVol(
+        lvol_handle, qlDate(2024, 7, 2), 100.0
+    ) == pytest.approx(0.25)
+    assert qlLocalVolTermStructureLocalVolFromTime(
+        lvol_handle, 0.5, 100.0
+    ) == pytest.approx(0.25)

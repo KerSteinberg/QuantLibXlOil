@@ -1,108 +1,105 @@
 import QuantLib as ql
 import pytest
 
-from quantlib_xloil.date import _qFrequency
-from quantlib_xloil.termstructures import _qCompounding
-from quantlib_xloil.cashflows import _qDurationType, _qRateAveragingType
-
-from quantlib_xloil import (
-    qlCalendar,
-    qlDate,
-    qlDayCounter,
-    qlSimpleCashFlow,
+from quantlib_xloil.cashflows import (
+    qDurationType,
+    qRateAveragingType,
+    qlAsCoupon,
+    qlAsCappedFlooredOvernightIndexedCoupon,
+    qlAsOvernightIndexedCoupon,
+    qlAveragingMultipleResetsPricer,
+    qlBlackAveragingOvernightIndexedCouponPricer,
+    qlBlackCompoundingOvernightIndexedCouponPricer,
+    qlBlackIborCouponPricer,
+    qlCappedFlooredCouponCap,
+    qlCappedFlooredIborCoupon,
+    qlCappedFlooredOvernightIndexedCoupon,
     qlCashFlowAmount,
     qlCashFlowDate,
     qlCashFlowHasOccurred,
-    qlAsCoupon,
-    qlFixedRateCoupon,
-    qlIborCoupon,
-    qlCouponNominal,
-    qlCouponAccrualStartDate,
-    qlCouponAccrualEndDate,
-    qlCouponReferencePeriodStart,
-    qlCouponReferencePeriodEnd,
-    qlCouponExCouponDate,
-    qlCouponRate,
-    qlCouponAccrualPeriod,
-    qlCouponAccrualDays,
-    qlCouponDayCounter,
-    qlCouponAccruedAmount,
-    qlFloatingRateCouponFixingDate,
-    qlFloatingRateCouponFixingDays,
-    qlFloatingRateCouponIsInArrears,
-    qlFloatingRateCouponGearing,
-    qlFloatingRateCouponSpread,
-    qlFloatingRateCouponIndexFixing,
-    qlFloatingRateCouponAdjustedFixing,
-    qlFloatingRateCouponConvexityAdjustment,
-    qlFloatingRateCouponPrice,
-    qlFloatingRateCouponIndex,
-    qlFloatingRateCouponSetPricer,
-    qlCappedFlooredCouponIsCapped,
-    qlCappedFlooredCouponIsFloored,
-    qlCappedFlooredCouponCap,
-    qlCappedFlooredCouponFloor,
-    qlCappedFlooredCouponEffectiveCap,
-    qlCappedFlooredCouponEffectiveFloor,
-    qlOvernightIndexedCouponAveragingMethod,
-    qlOvernightIndexedCouponCanApplyTelescopicFormula,
-    qlOvernightIndexedCouponApplyObservationShift,
-    qlOvernightIndexedCouponCompoundSpreadDaily,
-    qlOvernightIndexedCouponLockoutDays,
-    qlOvernightIndexedCouponRateComputationStartDate,
-    qlOvernightIndexedCouponRateComputationEndDate,
-    qlOvernightIndexedCouponValueDates,
-    qlOvernightIndexedCouponFixingDates,
-    qlOvernightIndexedCouponInterestDates,
-    qlOvernightIndexedCouponDt,
-    qlOvernightIndexedCouponIndexFixings,
-    qlOvernightIndexedCouponEffectiveIndexFixing,
-    qlOvernightIndexedCouponEffectiveSpread,
-    qlCappedFlooredOvernightIndexedCouponUnderlying,
-    qlCappedFlooredOvernightIndexedCouponNakedOption,
-    qlCappedFlooredOvernightIndexedCouponDailyCapFloor,
-    qlCappedFlooredOvernightIndexedCouponAveragingMethod,
-    qlCappedFlooredOvernightIndexedCouponCompoundSpreadDaily,
-    qlCappedFlooredOvernightIndexedCouponEffectiveCapletVolatility,
-    qlCappedFlooredOvernightIndexedCouponEffectiveFloorletVolatility,
-    qlFixedRateLeg,
-    qlIborLeg,
-    qlEuribor,
-    qlSofr,
-    qlCappedFlooredIborCoupon,
-    qlOvernightIndexedCoupon,
-    qlFlatForward,
-    qlCashFlowsStartDate,
-    qlCashFlowsMaturityDate,
-    qlCashFlowsPreviousCashFlow,
-    qlCashFlowsNextCashFlow,
-    qlCashFlowsAccrualPeriod,
     qlCashFlowsAccrualDays,
-    qlCashFlowsAccruedPeriod,
-    qlCashFlowsAccruedDays,
+    qlCashFlowsAccrualPeriod,
     qlCashFlowsAccruedAmount,
-    qlCashFlowsNpv,
+    qlCashFlowsAccruedDays,
+    qlCashFlowsAccruedPeriod,
+    qlCashFlowsAtmRate,
+    qlCashFlowsBasisPointValueFromInterestRate,
+    qlCashFlowsBasisPointValueFromRate,
     qlCashFlowsBps,
     qlCashFlowsBpsFromInterestRate,
     qlCashFlowsBpsFromRate,
-    qlCashFlowsNpvBps,
-    qlCashFlowsAtmRate,
-    qlCashFlowsYieldRate,
-    qlCashFlowsDurationFromRate,
     qlCashFlowsConvexityFromInterestRate,
-    qlCashFlowsBasisPointValueFromInterestRate,
-    qlCashFlowsBasisPointValueFromRate,
+    qlCashFlowsDurationFromRate,
+    qlCashFlowsMaturityDate,
+    qlCashFlowsNextCashFlow,
+    qlCashFlowsNpv,
+    qlCashFlowsNpvBps,
+    qlCashFlowsPreviousCashFlow,
+    qlCashFlowsStartDate,
+    qlCashFlowsYieldRate,
     qlCashFlowsZSpread,
-    qlBlackIborCouponPricer,
-    qlSetCouponPricer,
-    qlCappedFlooredOvernightIndexedCoupon,
-    qlAsOvernightIndexedCoupon,
-    qlAsCappedFlooredOvernightIndexedCoupon,
-    qlBlackCompoundingOvernightIndexedCouponPricer,
-    qlBlackAveragingOvernightIndexedCouponPricer,
+    qlCappedFlooredCouponEffectiveCap,
+    qlCappedFlooredCouponEffectiveFloor,
+    qlCappedFlooredCouponFloor,
+    qlCappedFlooredCouponIsCapped,
+    qlCappedFlooredCouponIsFloored,
+    qlCappedFlooredOvernightIndexedCouponAveragingMethod,
+    qlCappedFlooredOvernightIndexedCouponCompoundSpreadDaily,
+    qlCappedFlooredOvernightIndexedCouponDailyCapFloor,
+    qlCappedFlooredOvernightIndexedCouponEffectiveCapletVolatility,
+    qlCappedFlooredOvernightIndexedCouponEffectiveFloorletVolatility,
+    qlCappedFlooredOvernightIndexedCouponNakedOption,
+    qlCappedFlooredOvernightIndexedCouponUnderlying,
     qlCompoundingMultipleResetsPricer,
-    qlAveragingMultipleResetsPricer,
+    qlCouponAccrualDays,
+    qlCouponAccrualEndDate,
+    qlCouponAccrualPeriod,
+    qlCouponAccrualStartDate,
+    qlCouponAccruedAmount,
+    qlCouponDayCounter,
+    qlCouponExCouponDate,
+    qlCouponNominal,
+    qlCouponRate,
+    qlCouponReferencePeriodEnd,
+    qlCouponReferencePeriodStart,
+    qlFixedRateCoupon,
+    qlFixedRateLeg,
+    qlFloatingRateCouponAdjustedFixing,
+    qlFloatingRateCouponConvexityAdjustment,
+    qlFloatingRateCouponFixingDate,
+    qlFloatingRateCouponFixingDays,
+    qlFloatingRateCouponGearing,
+    qlFloatingRateCouponIndex,
+    qlFloatingRateCouponIndexFixing,
+    qlFloatingRateCouponIsInArrears,
+    qlFloatingRateCouponPrice,
+    qlFloatingRateCouponSetPricer,
+    qlFloatingRateCouponSpread,
+    qlIborCoupon,
+    qlIborLeg,
+    qlOvernightIndexedCoupon,
+    qlOvernightIndexedCouponApplyObservationShift,
+    qlOvernightIndexedCouponAveragingMethod,
+    qlOvernightIndexedCouponCanApplyTelescopicFormula,
+    qlOvernightIndexedCouponCompoundSpreadDaily,
+    qlOvernightIndexedCouponDt,
+    qlOvernightIndexedCouponEffectiveIndexFixing,
+    qlOvernightIndexedCouponEffectiveSpread,
+    qlOvernightIndexedCouponFixingDates,
+    qlOvernightIndexedCouponIndexFixings,
+    qlOvernightIndexedCouponInterestDates,
+    qlOvernightIndexedCouponLockoutDays,
+    qlOvernightIndexedCouponRateComputationEndDate,
+    qlOvernightIndexedCouponRateComputationStartDate,
+    qlOvernightIndexedCouponValueDates,
+    qlSetCouponPricer,
+    qlSimpleCashFlow,
 )
+from quantlib_xloil.calendars import qlCalendar
+from quantlib_xloil.date import qFrequency, qlDate
+from quantlib_xloil.daycounters import qlDayCounter
+from quantlib_xloil.indexes import qlEuribor, qlSofr
+from quantlib_xloil.termstructures import qCompounding, qlFlatForward
 
 
 def _schedule(start: ql.Date, end: ql.Date) -> ql.Schedule:
@@ -123,16 +120,16 @@ def _curve(reference_date: ql.Date, rate: float = 0.05) -> ql.YieldTermStructure
         reference_date,
         rate,
         qlDayCounter("ACTUAL365FIXED"),
-        _qCompounding("COMPOUNDED"),
-        _qFrequency("ANNUAL"),
+        qCompounding.__wrapped__("COMPOUNDED"),
+        qFrequency.__wrapped__("ANNUAL"),
         qlCalendar("TARGET"),
     )
 
 
 def test_cashflow_converters():
-    assert _qDurationType("simple") == ql.Duration.Simple
-    assert _qDurationType("MODIFIED") == ql.Duration.Modified
-    assert _qRateAveragingType("compound") == ql.RateAveraging.Compound
+    assert qDurationType.__wrapped__("simple") == ql.Duration.Simple
+    assert qDurationType.__wrapped__("MODIFIED") == ql.Duration.Modified
+    assert qRateAveragingType.__wrapped__("compound") == ql.RateAveraging.Compound
 
 
 def test_simple_cashflow_accessors_and_cast():
@@ -293,7 +290,7 @@ def test_overnightindexedcoupon_methods_on_sofr_coupon():
         end_date,
         day_counter,
         False,
-        _qRateAveragingType("COMPOUND"),
+        qRateAveragingType.__wrapped__("COMPOUND"),
         ql.nullInt(),
         0,
         False,
@@ -302,7 +299,9 @@ def test_overnightindexedcoupon_methods_on_sofr_coupon():
 
     try:
         assert qlOvernightIndexedCouponAveragingMethod(coupon) == "COMPOUND"
-        assert isinstance(qlOvernightIndexedCouponCanApplyTelescopicFormula(coupon), bool)
+        assert isinstance(
+            qlOvernightIndexedCouponCanApplyTelescopicFormula(coupon), bool
+        )
         assert qlOvernightIndexedCouponApplyObservationShift(coupon) is False
         assert qlOvernightIndexedCouponCompoundSpreadDaily(coupon) is False
         assert qlOvernightIndexedCouponLockoutDays(coupon) == 0
@@ -351,7 +350,7 @@ def test_cappedflooredovernightindexedcoupon_methods():
         end_date,
         day_counter,
         False,
-        _qRateAveragingType("COMPOUND"),
+        qRateAveragingType.__wrapped__("COMPOUND"),
         ql.nullInt(),
         0,
         False,
@@ -363,7 +362,9 @@ def test_cappedflooredovernightindexedcoupon_methods():
         assert qlCappedFlooredOvernightIndexedCouponUnderlying(coupon) is not None
         assert qlCappedFlooredOvernightIndexedCouponNakedOption(coupon) is False
         assert qlCappedFlooredOvernightIndexedCouponDailyCapFloor(coupon) is False
-        assert qlCappedFlooredOvernightIndexedCouponAveragingMethod(coupon) == "COMPOUND"
+        assert (
+            qlCappedFlooredOvernightIndexedCouponAveragingMethod(coupon) == "COMPOUND"
+        )
         assert qlCappedFlooredOvernightIndexedCouponCompoundSpreadDaily(coupon) is False
 
         # These two accessors require a compatible pricer setup in QuantLib.
@@ -392,25 +393,25 @@ def test_fixed_rate_leg_cashflows_analytics():
         leg,
         npv,
         day_counter,
-        _qCompounding("COMPOUNDED"),
-        _qFrequency("ANNUAL"),
+        qCompounding.__wrapped__("COMPOUNDED"),
+        qFrequency.__wrapped__("ANNUAL"),
         False,
     )
     duration = qlCashFlowsDurationFromRate(
         leg,
         ytm,
         day_counter,
-        _qCompounding("COMPOUNDED"),
-        _qFrequency("ANNUAL"),
-        _qDurationType("MODIFIED"),
+        qCompounding.__wrapped__("COMPOUNDED"),
+        qFrequency.__wrapped__("ANNUAL"),
+        qDurationType.__wrapped__("MODIFIED"),
         False,
     )
     bpv = qlCashFlowsBasisPointValueFromRate(
         leg,
         ytm,
         day_counter,
-        _qCompounding("COMPOUNDED"),
-        _qFrequency("ANNUAL"),
+        qCompounding.__wrapped__("COMPOUNDED"),
+        qFrequency.__wrapped__("ANNUAL"),
         False,
     )
     z_spread = qlCashFlowsZSpread(
@@ -418,8 +419,8 @@ def test_fixed_rate_leg_cashflows_analytics():
         npv,
         curve.currentLink(),
         day_counter,
-        _qCompounding("COMPOUNDED"),
-        _qFrequency("ANNUAL"),
+        qCompounding.__wrapped__("COMPOUNDED"),
+        qFrequency.__wrapped__("ANNUAL"),
         False,
     )
 
@@ -482,8 +483,8 @@ def test_cashflows_overload_analytics_step2():
     end = qlDate(2027, 1, 2)
     schedule = _schedule(start, end)
     day_counter = qlDayCounter("ACTUAL365FIXED")
-    compounding = _qCompounding("COMPOUNDED")
-    frequency = _qFrequency("ANNUAL")
+    compounding = qCompounding.__wrapped__("COMPOUNDED")
+    frequency = qFrequency.__wrapped__("ANNUAL")
 
     leg = qlFixedRateLeg(schedule, day_counter, [100.0], [0.05])
     curve_handle = _curve(start, 0.05)
@@ -498,7 +499,9 @@ def test_cashflows_overload_analytics_step2():
     ir = ql.InterestRate(ytm, day_counter, compounding, frequency)
 
     bps_ir = qlCashFlowsBpsFromInterestRate(leg, ir, False)
-    bps_rate = qlCashFlowsBpsFromRate(leg, ytm, day_counter, compounding, frequency, False)
+    bps_rate = qlCashFlowsBpsFromRate(
+        leg, ytm, day_counter, compounding, frequency, False
+    )
     assert abs(bps_ir - bps_rate) < 1.0e-10
 
     npvbps = qlCashFlowsNpvBps(leg, curve_handle, False)
@@ -550,7 +553,17 @@ def test_overnight_cappedfloored_coupon_and_casts():
 
 
 def test_additional_pricer_constructors():
-    assert isinstance(qlBlackCompoundingOvernightIndexedCouponPricer(), ql.BlackCompoundingOvernightIndexedCouponPricer)
-    assert isinstance(qlBlackAveragingOvernightIndexedCouponPricer(), ql.BlackAveragingOvernightIndexedCouponPricer)
-    assert isinstance(qlCompoundingMultipleResetsPricer(), ql.CompoundingMultipleResetsPricer)
-    assert isinstance(qlAveragingMultipleResetsPricer(), ql.AveragingMultipleResetsPricer)
+    assert isinstance(
+        qlBlackCompoundingOvernightIndexedCouponPricer(),
+        ql.BlackCompoundingOvernightIndexedCouponPricer,
+    )
+    assert isinstance(
+        qlBlackAveragingOvernightIndexedCouponPricer(),
+        ql.BlackAveragingOvernightIndexedCouponPricer,
+    )
+    assert isinstance(
+        qlCompoundingMultipleResetsPricer(), ql.CompoundingMultipleResetsPricer
+    )
+    assert isinstance(
+        qlAveragingMultipleResetsPricer(), ql.AveragingMultipleResetsPricer
+    )

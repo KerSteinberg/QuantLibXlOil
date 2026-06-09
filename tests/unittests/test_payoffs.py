@@ -1,7 +1,6 @@
 import QuantLib as ql
-from quantlib_xloil.payoffs import _qOptionType
 
-from quantlib_xloil import (
+from quantlib_xloil.payoffs import (
     qOptionType,
     qlPayoffValue,
     qlTypePayoffOptionType,
@@ -18,12 +17,12 @@ from quantlib_xloil import (
 
 
 def test_payoff_option_type_converter_and_name():
-    assert _qOptionType("call") == ql.Option.Call
-    assert _qOptionType("PUT") == ql.Option.Put
+    assert qOptionType.__wrapped__("call") == ql.Option.Call
+    assert qOptionType.__wrapped__("PUT") == ql.Option.Put
 
 
 def test_plain_vanilla_payoff_and_cast():
-    payoff = qlPlainVanillaPayoff(_qOptionType("call"), 100.0)
+    payoff = qlPlainVanillaPayoff(qOptionType.__wrapped__("call"), 100.0)
 
     assert qlTypePayoffOptionType(payoff) == "CALL"
     assert qlStrikedTypePayoffStrike(payoff) == 100.0
@@ -31,14 +30,13 @@ def test_plain_vanilla_payoff_and_cast():
     assert qlAsPlainVanillaPayoff(payoff) is not None
 
 
-
 def test_other_payoff_constructors_and_values():
-    pct = qlPercentageStrikePayoff(_qOptionType("call"), 0.90)
-    con = qlCashOrNothingPayoff(_qOptionType("call"), 100.0, 10.0)
-    aon = qlAssetOrNothingPayoff(_qOptionType("call"), 100.0)
-    sup = qlSuperSharePayoff(_qOptionType("call"), 100.0, 5.0)
-    gap = qlGapPayoff(_qOptionType("call"), 100.0, 95.0)
-    vf = qlVanillaForwardPayoff(_qOptionType("call"), 100.0)
+    pct = qlPercentageStrikePayoff(qOptionType.__wrapped__("call"), 0.90)
+    con = qlCashOrNothingPayoff(qOptionType.__wrapped__("call"), 100.0, 10.0)
+    aon = qlAssetOrNothingPayoff(qOptionType.__wrapped__("call"), 100.0)
+    sup = qlSuperSharePayoff(qOptionType.__wrapped__("call"), 100.0, 5.0)
+    gap = qlGapPayoff(qOptionType.__wrapped__("call"), 100.0, 95.0)
+    vf = qlVanillaForwardPayoff(qOptionType.__wrapped__("call"), 100.0)
 
     assert qlTypePayoffOptionType(pct) == "CALL"
     assert qlStrikedTypePayoffStrike(pct) > 0.0

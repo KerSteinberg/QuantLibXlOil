@@ -5,17 +5,18 @@ import xloil as xlo
 
 from .config import EXCEL_GROUP_NAME
 
+
 @xlo.func(
-    help='Return the QuantLib version as a string.',
+    help="Return the QuantLib version as a string.",
     group=EXCEL_GROUP_NAME,
 )
-def qlVersion(trigger = None):
+def qlVersion(trigger=None):
     return ql.__version__
 
 
 @xlo.func(
-    help='Return the QuantLib hex version as an integer.',
+    help="Return the QuantLib hex version as an integer.",
     group=EXCEL_GROUP_NAME,
 )
-def qlHexVersion(trigger = None):
+def qlHexVersion(trigger=None):
     return ql.__hexversion__
