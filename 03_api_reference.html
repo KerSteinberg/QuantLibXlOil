@@ -1,0 +1,765 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Adding Own Functions" href="04_adding_functions.html"><link rel="prev" title="Example Sheets" href="02_example_sheets.html">
+
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>API Reference - QuantLibXlOil documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=acfd86a5" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">QuantLibXlOil  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  <span class="sidebar-brand-text">QuantLibXlOil  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="01_getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_example_sheets.html">Example Sheets</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_adding_functions.html">Adding Own Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_contributing.html">Contributing to QuantLibXlOil</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="_sources/03_api_reference.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="api-reference">
+<h1>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading">¶</a></h1>
+<p>This section lists the QuantLib functions made available to Excel.</p>
+<section id="calendars">
+<h2>Calendars<a class="headerlink" href="#calendars" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/calendars.py#L96">qCalendar</a>(calendarname: str)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/calendars.py#L107">qBusinessDayConvention</a>(conventionname: str)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/calendars.py#L115">qJointCalendarRule</a>(rule_name: str)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/calendars.py#L126">qlCalendar</a>(calendar_name: str, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/calendars.py#L136">qlCalendarisWeekend</a>(calendar: qCalendar, weekday: qWeekday, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/calendars.py#L148">qlCalendarStartOfMonth</a>(calendar: qCalendar, date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/calendars.py#L159">qlCalendarEndOfMonth</a>(calendar: qCalendar, date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/calendars.py#L170">qlCalendarIsBusinessDay</a>(calendar: qCalendar, date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/calendars.py#L180">qlCalendarIsHoliday</a>(calendar: qCalendar, date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/calendars.py#L190">qlCalendarIsEndOfMonth</a>(calendar: qCalendar, date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/calendars.py#L200">qlCalendarIsStartOfMonth</a>(calendar: qCalendar, date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/calendars.py#L210">qlCalendarAddHoliday</a>(calendar: qCalendar, date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/calendars.py#L220">qlCalendarRemoveHoliday</a>(calendar: qCalendar, date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/calendars.py#L228">qlCalendarResetAddedAndRemovedHolidays</a>(calendar: qCalendar, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/calendars.py#L242">qlCalendarAdjust</a>(calendar: qCalendar, date: qDate, convention: qBusinessDayConvention = “Following”, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/calendars.py#L257">qlCalendarAdvance</a>(calendar: qCalendar, date: qDate, n: int, unit: qTimeUnit, convention: qBusinessDayConvention = “Following”, end_of_month: bool = False, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/calendars.py#L271">qlCalendarAdvance2</a>(calendar: qCalendar, date: qDate, period: qPeriod, convention: qBusinessDayConvention = “Following”, end_of_month: bool = False, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/calendars.py#L286">qlCalendarBusinessDaysBetween</a>(calendar: qCalendar, from_date: qDate, to_date: qDate, include_first: bool = True, include_last: bool = False, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/calendars.py#L296">qlCalendarHolidayList</a>(calendar: qCalendar, from_date: qDate, to_date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/calendars.py#L307">qlCalendarBusinessDayList</a>(calendar: qCalendar, from_date: qDate, to_date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/calendars.py#L317">qlCalendarName</a>(calendar: qCalendar, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/calendars.py#L327">qlCalendarEmpty</a>(calendar: qCalendar, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/calendars.py#L339">qlCalendarJointCalendar</a>(calendar1: qCalendar, calendar2: qCalendar, rule: qJointCalendarRule = “JOINHOLIDAYS”)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/calendars.py#L352">qlCalendarJointCalendar2</a>(calendar1: qCalendar, calendar2: qCalendar, calendar3: qCalendar, rule: qJointCalendarRule = “JOINHOLIDAYS”, trigger = None)</p>
+</section>
+<section id="cashflows">
+<h2>Cashflows<a class="headerlink" href="#cashflows" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L75">qDurationType</a>(duration_type: str)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L80">qRateAveragingType</a>(averaging_type: str)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L92">qlSimpleCashFlow</a>(amount: float, date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L104">qlRedemption</a>(amount: float, date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L116">qlAmortizingPayment</a>(amount: float, date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L132">qlIndexedCashFlow</a>(notional: float, index: ql.Index, base_date: qDate, fixing_date: qDate, payment_date: qDate, growth_only: bool = False, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L151">qlCashFlowAmount</a>(cashflow: ql.CashFlow, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L162">qlCashFlowDate</a>(cashflow: ql.CashFlow, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L174">qlCashFlowHasOccurred</a>(cashflow: ql.CashFlow, ref_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L185">qlAsIndexedCashFlow</a>(cashflow: ql.CashFlow, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L196">qlAsCoupon</a>(cashflow: ql.CashFlow, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L207">qlCouponNominal</a>(coupon: ql.Coupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L218">qlCouponAccrualStartDate</a>(coupon: ql.Coupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L229">qlCouponAccrualEndDate</a>(coupon: ql.Coupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L240">qlCouponReferencePeriodStart</a>(coupon: ql.Coupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L251">qlCouponReferencePeriodEnd</a>(coupon: ql.Coupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L262">qlCouponExCouponDate</a>(coupon: ql.Coupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L273">qlCouponRate</a>(coupon: ql.Coupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L284">qlCouponAccrualPeriod</a>(coupon: ql.Coupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L295">qlCouponAccrualDays</a>(coupon: ql.Coupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L306">qlCouponDayCounter</a>(coupon: ql.Coupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L318">qlCouponAccruedAmount</a>(coupon: ql.Coupon, date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L329">qlAsFixedRateCoupon</a>(cashflow: ql.CashFlow, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L340">qlAsFloatingRateCoupon</a>(cashflow: ql.CashFlow, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L351">qlFloatingRateCouponFixingDate</a>(coupon: ql.FloatingRateCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L362">qlFloatingRateCouponFixingDays</a>(coupon: ql.FloatingRateCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L373">qlFloatingRateCouponIsInArrears</a>(coupon: ql.FloatingRateCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L384">qlFloatingRateCouponGearing</a>(coupon: ql.FloatingRateCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L395">qlFloatingRateCouponSpread</a>(coupon: ql.FloatingRateCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L406">qlFloatingRateCouponIndexFixing</a>(coupon: ql.FloatingRateCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L417">qlFloatingRateCouponAdjustedFixing</a>(coupon: ql.FloatingRateCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L428">qlFloatingRateCouponConvexityAdjustment</a>(coupon: ql.FloatingRateCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L440">qlFloatingRateCouponPrice</a>(coupon: ql.FloatingRateCoupon, discount_curve: ql.YieldTermStructureHandle, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L455">qlFloatingRateCouponIndex</a>(coupon: ql.FloatingRateCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L467">qlFloatingRateCouponSetPricer</a>(coupon: ql.FloatingRateCoupon, pricer: ql.FloatingRateCouponPricer, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L483">qlCappedFlooredCouponIsCapped</a>(coupon: ql.CappedFlooredCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L494">qlCappedFlooredCouponIsFloored</a>(coupon: ql.CappedFlooredCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L505">qlCappedFlooredCouponCap</a>(coupon: ql.CappedFlooredCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L516">qlCappedFlooredCouponFloor</a>(coupon: ql.CappedFlooredCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L527">qlCappedFlooredCouponEffectiveCap</a>(coupon: ql.CappedFlooredCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L538">qlCappedFlooredCouponEffectiveFloor</a>(coupon: ql.CappedFlooredCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L549">qlOvernightIndexedCouponAveragingMethod</a>(coupon: ql.OvernightIndexedCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L560">qlOvernightIndexedCouponCanApplyTelescopicFormula</a>(coupon: ql.OvernightIndexedCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L571">qlOvernightIndexedCouponApplyObservationShift</a>(coupon: ql.OvernightIndexedCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L582">qlOvernightIndexedCouponCompoundSpreadDaily</a>(coupon: ql.OvernightIndexedCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L593">qlOvernightIndexedCouponLockoutDays</a>(coupon: ql.OvernightIndexedCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L604">qlOvernightIndexedCouponRateComputationStartDate</a>(coupon: ql.OvernightIndexedCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L615">qlOvernightIndexedCouponRateComputationEndDate</a>(coupon: ql.OvernightIndexedCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L626">qlOvernightIndexedCouponValueDates</a>(coupon: ql.OvernightIndexedCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L637">qlOvernightIndexedCouponFixingDates</a>(coupon: ql.OvernightIndexedCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L648">qlOvernightIndexedCouponInterestDates</a>(coupon: ql.OvernightIndexedCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L659">qlOvernightIndexedCouponDt</a>(coupon: ql.OvernightIndexedCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L670">qlOvernightIndexedCouponIndexFixings</a>(coupon: ql.OvernightIndexedCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L681">qlOvernightIndexedCouponEffectiveIndexFixing</a>(coupon: ql.OvernightIndexedCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L692">qlOvernightIndexedCouponEffectiveSpread</a>(coupon: ql.OvernightIndexedCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L703">qlCappedFlooredOvernightIndexedCouponUnderlying</a>(coupon: ql.CappedFlooredOvernightIndexedCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L717">qlCappedFlooredOvernightIndexedCouponNakedOption</a>(coupon: ql.CappedFlooredOvernightIndexedCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L731">qlCappedFlooredOvernightIndexedCouponDailyCapFloor</a>(coupon: ql.CappedFlooredOvernightIndexedCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L745">qlCappedFlooredOvernightIndexedCouponAveragingMethod</a>(coupon: ql.CappedFlooredOvernightIndexedCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L759">qlCappedFlooredOvernightIndexedCouponCompoundSpreadDaily</a>(coupon: ql.CappedFlooredOvernightIndexedCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L773">qlCappedFlooredOvernightIndexedCouponEffectiveCapletVolatility</a>(coupon: ql.CappedFlooredOvernightIndexedCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L787">qlCappedFlooredOvernightIndexedCouponEffectiveFloorletVolatility</a>(coupon: ql.CappedFlooredOvernightIndexedCoupon, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L801">qlAsOvernightIndexedCoupon</a>(cashflow: ql.CashFlow, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L812">qlAsCappedFlooredOvernightIndexedCoupon</a>(cashflow: ql.CashFlow, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L823">qlAsMultipleResetsCoupon</a>(cashflow: ql.CashFlow, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L842">qlFixedRateCoupon</a>(payment_date: qDate, nominal: float, rate: float, day_counter: qDayCounter, start_date: qDate, end_date: qDate, ref_period_start: qDate = ql.Date(), ref_period_end: qDate = ql.Date(), ex_coupon_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L886">qlIborCoupon</a>(payment_date: qDate, nominal: float, start_date: qDate, end_date: qDate, fixing_days: int, index: ql.IborIndex, gearing: float = 1.0, spread: float = 0.0, ref_period_start: qDate = ql.Date(), ref_period_end: qDate = ql.Date(), day_counter: qDayCounter = ql.Actual365Fixed(), is_in_arrears: bool = False, ex_coupon_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L942">qlCappedFlooredIborCoupon</a>(payment_date: qDate, nominal: float, start_date: qDate, end_date: qDate, fixing_days: int, index: ql.IborIndex, gearing: float = 1.0, spread: float = 0.0, cap: float = ql.nullDouble(), floor: float = ql.nullDouble(), ref_period_start: qDate = ql.Date(), ref_period_end: qDate = ql.Date(), day_counter: qDayCounter = ql.Actual365Fixed(), is_in_arrears: bool = False, ex_coupon_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1001">qlOvernightIndexedCoupon</a>(payment_date: qDate, nominal: float, start_date: qDate, end_date: qDate, overnight_index: ql.OvernightIndex, gearing: float = 1.0, spread: float = 0.0, ref_period_start: qDate = ql.Date(), ref_period_end: qDate = ql.Date(), day_counter: qDayCounter = ql.Actual365Fixed(), telescopic_value_dates: bool = False, averaging_method: qRateAveragingType = ql.RateAveraging.Compound, lookback_days: int = ql.nullInt(), lockout_days: int = 0, apply_observation_shift: bool = False, compound_spread: bool = False, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1051">qlCappedFlooredOvernightIndexedCoupon</a>(underlying: ql.OvernightIndexedCoupon, cap: float = ql.nullDouble(), floor: float = ql.nullDouble(), naked_option: bool = False, daily_cap_floor: bool = False, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1081">qlCmsCoupon</a>(payment_date: qDate, nominal: float, start_date: qDate, end_date: qDate, fixing_days: int, index: ql.SwapIndex, gearing: float = 1.0, spread: float = 0.0, ref_period_start: qDate = ql.Date(), ref_period_end: qDate = ql.Date(), day_counter: qDayCounter = ql.Actual365Fixed(), is_in_arrears: bool = False, ex_coupon_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1133">qlCmsSpreadCoupon</a>(payment_date: qDate, nominal: float, start_date: qDate, end_date: qDate, fixing_days: int, index: ql.SwapSpreadIndex, gearing: float = 1.0, spread: float = 0.0, ref_period_start: qDate = ql.Date(), ref_period_end: qDate = ql.Date(), day_counter: qDayCounter = ql.Actual365Fixed(), is_in_arrears: bool = False, ex_coupon_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1186">qlRangeAccrualFloatersCoupon</a>(payment_date: qDate, nominal: float, index: ql.IborIndex, start_date: qDate, end_date: qDate, fixing_days: int, day_counter: qDayCounter, gearing: float, spread: float, ref_period_start: qDate, ref_period_end: qDate, observations_schedule: ql.Schedule, lower_trigger: float, upper_trigger: float, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1239">qlMultipleResetsCoupon</a>(payment_date: qDate, nominal: float, reset_schedule: ql.Schedule, fixing_days: int, index: ql.IborIndex, gearing: float = 1.0, coupon_spread: float = 0.0, rate_spread: float = 0.0, ref_period_start: qDate = ql.Date(), ref_period_end: qDate = ql.Date(), day_counter: qDayCounter = ql.Actual365Fixed(), ex_coupon_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1279">qlBlackIborCouponPricer</a>(volatility: ql.OptionletVolatilityStructureHandle = ql.OptionletVolatilityStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1290">qlCompoundingOvernightIndexedCouponPricer</a>(trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1303">qlArithmeticAveragedOvernightIndexedCouponPricer</a>(mean_reversion: float = 0.03, volatility: float = 0.0, by_approx: bool = False, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1320">qlBlackCompoundingOvernightIndexedCouponPricer</a>(volatility: ql.OptionletVolatilityStructureHandle = ql.OptionletVolatilityStructureHandle(), effective_volatility_input: bool = False, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1336">qlBlackAveragingOvernightIndexedCouponPricer</a>(volatility: ql.OptionletVolatilityStructureHandle = ql.OptionletVolatilityStructureHandle(), effective_volatility_input: bool = False, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1348">qlCompoundingMultipleResetsPricer</a>(trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1356">qlAveragingMultipleResetsPricer</a>(trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1368">qlSetCouponPricer</a>(leg: xlo.Array(dims=1), pricer: ql.FloatingRateCouponPricer, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1384">qlFixedRateLeg</a>(schedule: ql.Schedule, day_counter: qDayCounter, nominals, coupon_rates, payment_adjustment: qBusinessDayConvention = ql.Following, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1412">qlIborLeg</a>(nominals, schedule: ql.Schedule, index: ql.IborIndex, payment_day_counter: qDayCounter = ql.Actual365Fixed(), payment_convention: qBusinessDayConvention = ql.Following, fixing_days = (), gearings = (), spreads = (), caps = (), floors = (), is_in_arrears: bool = False, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1456">qlOvernightLeg</a>(nominals, schedule: ql.Schedule, index: ql.OvernightIndex, payment_day_counter: qDayCounter = ql.Actual360(), payment_convention: qBusinessDayConvention = ql.Following, gearings = (), spreads = (), telescopic_value_dates: bool = False, averaging_method: qRateAveragingType = ql.RateAveraging.Compound, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1492">qlCmsLeg</a>(nominals, schedule: ql.Schedule, index: ql.SwapIndex, payment_day_counter: qDayCounter = ql.Actual365Fixed(), payment_convention: qBusinessDayConvention = ql.Following, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1514">qlCmsZeroLeg</a>(nominals, schedule: ql.Schedule, index: ql.SwapIndex, payment_day_counter: qDayCounter = ql.Actual365Fixed(), payment_convention: qBusinessDayConvention = ql.Following, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1536">qlCmsSpreadLeg</a>(nominals, schedule: ql.Schedule, index: ql.SwapSpreadIndex, payment_day_counter: qDayCounter = ql.Actual365Fixed(), payment_convention: qBusinessDayConvention = ql.Following, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1557">qlMultipleResetsLeg</a>(full_reset_schedule: ql.Schedule, index: ql.IborIndex, resets_per_coupon: int, nominals, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1578">qlRangeAccrualLeg</a>(nominals, schedule: ql.Schedule, index: ql.IborIndex, payment_day_counter: qDayCounter = ql.Actual360(), payment_convention: qBusinessDayConvention = ql.Following, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1596">qlCashFlowsStartDate</a>(leg: xlo.Array(dims=1), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1607">qlCashFlowsMaturityDate</a>(leg: xlo.Array(dims=1), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1620">qlCashFlowsPreviousCashFlowDate</a>(leg: xlo.Array(dims=1), include_settlement_date_flows: bool, settlement_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1638">qlCashFlowsNextCashFlowDate</a>(leg: xlo.Array(dims=1), include_settlement_date_flows: bool, settlement_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1656">qlCashFlowsPreviousCashFlowAmount</a>(leg: xlo.Array(dims=1), include_settlement_date_flows: bool, settlement_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1674">qlCashFlowsNextCashFlowAmount</a>(leg: xlo.Array(dims=1), include_settlement_date_flows: bool, settlement_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1692">qlCashFlowsPreviousCashFlow</a>(leg: xlo.Array(dims=1), include_settlement_date_flows: bool, settlement_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1710">qlCashFlowsNextCashFlow</a>(leg: xlo.Array(dims=1), include_settlement_date_flows: bool, settlement_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1728">qlCashFlowsAccrualPeriod</a>(leg: xlo.Array(dims=1), include_settlement_date_flows: bool, settlement_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1746">qlCashFlowsAccrualDays</a>(leg: xlo.Array(dims=1), include_settlement_date_flows: bool, settlement_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1764">qlCashFlowsAccruedPeriod</a>(leg: xlo.Array(dims=1), include_settlement_date_flows: bool, settlement_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1782">qlCashFlowsAccruedDays</a>(leg: xlo.Array(dims=1), include_settlement_date_flows: bool, settlement_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1800">qlCashFlowsAccruedAmount</a>(leg: xlo.Array(dims=1), include_settlement_date_flows: bool, settlement_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1820">qlCashFlowsNpv</a>(leg: xlo.Array(dims=1), discount_curve: ql.YieldTermStructureHandle, include_settlement_date_flows: bool, settlement_date: qDate = ql.Date(), npv_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1842">qlCashFlowsNpvFromInterestRate</a>(leg: xlo.Array(dims=1), interest_rate: ql.InterestRate, include_settlement_date_flows: bool, settlement_date: qDate = ql.Date(), npv_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1867">qlCashFlowsNpvFromRate</a>(leg: xlo.Array(dims=1), _yield: float, day_counter: qDayCounter, compounding: qCompounding, frequency: qFrequency, include_settlement_date_flows: bool, settlement_date: qDate = ql.Date(), npv_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1905">qlCashFlowsNpvFromZSpread</a>(leg: xlo.Array(dims=1), discount_curve: ql.YieldTermStructureHandle, z_spread: float, day_counter: qDayCounter, compounding: qCompounding, frequency: qFrequency, include_settlement_date_flows: bool, settlement_date: qDate = ql.Date(), npv_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1941">qlCashFlowsBps</a>(leg: xlo.Array(dims=1), discount_curve: ql.YieldTermStructureHandle, include_settlement_date_flows: bool, settlement_date: qDate = ql.Date(), npv_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1962">qlCashFlowsBpsFromInterestRate</a>(leg: xlo.Array(dims=1), interest_rate: ql.InterestRate, include_settlement_date_flows: bool, settlement_date: qDate = ql.Date(), npv_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L1987">qlCashFlowsBpsFromRate</a>(leg: xlo.Array(dims=1), _yield: float, day_counter: qDayCounter, compounding: qCompounding, frequency: qFrequency, include_settlement_date_flows: bool, settlement_date: qDate = ql.Date(), npv_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L2021">qlCashFlowsNpvBps</a>(leg: xlo.Array(dims=1), discount_curve: ql.YieldTermStructureHandle, include_settlement_date_flows: bool, settlement_date: qDate = ql.Date(), npv_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L2045">qlCashFlowsAtmRate</a>(leg: xlo.Array(dims=1), discount_curve: ql.YieldTermStructureHandle, include_settlement_date_flows: bool, settlement_date: qDate = ql.Date(), npv_date: qDate = ql.Date(), npv: float = ql.nullDouble(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L2071">qlCashFlowsYieldRate</a>(leg: xlo.Array(dims=1), npv: float, day_counter: qDayCounter, compounding: qCompounding, frequency: qFrequency, include_settlement_date_flows: bool, settlement_date: qDate = ql.Date(), npv_date: qDate = ql.Date(), accuracy: float = 1.0e-10, max_iterations: int = 10000, guess: float = 0.05, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L2111">qlCashFlowsDurationFromInterestRate</a>(leg: xlo.Array(dims=1), interest_rate: ql.InterestRate, duration_type: qDurationType, include_settlement_date_flows: bool, settlement_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L2135">qlCashFlowsDurationFromRate</a>(leg: xlo.Array(dims=1), _yield: float, day_counter: qDayCounter, compounding: qCompounding, frequency: qFrequency, duration_type: qDurationType, include_settlement_date_flows: bool, settlement_date: qDate = ql.Date(), npv_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L2172">qlCashFlowsConvexityFromRate</a>(leg: xlo.Array(dims=1), _yield: float, day_counter: qDayCounter, compounding: qCompounding, frequency: qFrequency, include_settlement_date_flows: bool, settlement_date: qDate = ql.Date(), npv_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L2206">qlCashFlowsConvexityFromInterestRate</a>(leg: xlo.Array(dims=1), interest_rate: ql.InterestRate, include_settlement_date_flows: bool, settlement_date: qDate = ql.Date(), npv_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L2229">qlCashFlowsBasisPointValueFromRate</a>(leg: xlo.Array(dims=1), _yield: float, day_counter: qDayCounter, compounding: qCompounding, frequency: qFrequency, include_settlement_date_flows: bool, settlement_date: qDate = ql.Date(), npv_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L2263">qlCashFlowsBasisPointValueFromInterestRate</a>(leg: xlo.Array(dims=1), interest_rate: ql.InterestRate, include_settlement_date_flows: bool, settlement_date: qDate = ql.Date(), npv_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L2287">qlCashFlowsZSpread</a>(leg: xlo.Array(dims=1), npv: float, discount_curve: ql.YieldTermStructure, day_counter: qDayCounter, compounding: qCompounding, frequency: qFrequency, include_settlement_date_flows: bool, settlement_date: qDate = ql.Date(), npv_date: qDate = ql.Date(), accuracy: float = 1.0e-10, max_iterations: int = 100, guess: float = 0.0, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L2325">qlDurationTypeName</a>(duration_type: qDurationType, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/cashflows.py#L2336">qlRateAveragingTypeName</a>(averaging_type: qRateAveragingType, trigger = None)</p>
+</section>
+<section id="currencies">
+<h2>Currencies<a class="headerlink" href="#currencies" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/currencies.py#L130">qCurrency</a>(code: str)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/currencies.py#L147">qlCurrency</a>(name: str, code: str, numerical_code: int, symbol: str, fraction_symbol: str, fractions_per_unit: int, rounding: ql.Rounding, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/currencies.py#L176">qlCurrencyName</a>(currency: qCurrency, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/currencies.py#L186">qlCurrencyCode</a>(currency: qCurrency, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/currencies.py#L196">qlCurrencyNumericalCode</a>(currency: qCurrency, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/currencies.py#L206">qlCurrencySymbol</a>(currency: qCurrency, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/currencies.py#L216">qlCurrencyFractionSymbol</a>(currency: qCurrency, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/currencies.py#L226">qlCurrencyFractionsPerUnit</a>(currency: qCurrency, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/currencies.py#L236">qlCurrencyRounding</a>(currency: qCurrency, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/currencies.py#L246">qlCurrencyTriangulationCurrency</a>(currency: qCurrency, trigger = None)</p>
+</section>
+<section id="date">
+<h2>Date<a class="headerlink" href="#date" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/date.py#L62">qWeekday</a>(s: str)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/date.py#L66">qFrequency</a>(s: str)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/date.py#L70">qTimeUnit</a>(s: str)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/date.py#L74">qPeriod</a>(s: str)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/date.py#L89">qlPeriod</a>(n: int, unit: qTimeUnit, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/date.py#L99">qlPeriodLength</a>(period: qPeriod, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/date.py#L109">qlPeriodUnits</a>(period: qPeriod, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/date.py#L119">qlPeriodFrequency</a>(period: qPeriod, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/date.py#L129">qlPeriodNormalized</a>(period: qPeriod, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/date.py#L140">qDate</a>(serialnumber)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/date.py#L157">qlDate</a>(year: int, month: int, day: int, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/date.py#L167">qlDateWeekday</a>(date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/date.py#L177">qlDateDayOfMonth</a>(date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/date.py#L187">qlDateDayOfYear</a>(date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/date.py#L197">qlDateMonth</a>(date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/date.py#L207">qlDateYear</a>(date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/date.py#L217">qlDateIsLeap</a>(year: int, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/date.py#L224">qlDateMinDate</a>(trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/date.py#L231">qlDateMaxDate</a>(trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/date.py#L238">qlDateTodaysDate</a>(trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/date.py#L247">qlDateStartOfMonth</a>(date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/date.py#L256">qlDateEndOfMonth</a>(date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/date.py#L265">qlDateIsStartOfMonth</a>(date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/date.py#L274">qlDateIsEndOfMonth</a>(date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/date.py#L284">qlDateNextWeekday</a>(date: qDate, weekday: qWeekday, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/date.py#L296">qlDateNthWeekday</a>(n: int, weekday: qWeekday, month: int, year: int, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/date.py#L307">qlDateParserParseFormatted</a>(date_string: str, format_string: str, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/date.py#L316">qlDateParserParseISO</a>(date_string: str, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/date.py#L325">qlPeriodParserParse</a>(period_string: str, trigger = None)</p>
+</section>
+<section id="daycounters">
+<h2>Daycounters<a class="headerlink" href="#daycounters" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/daycounters.py#L50">qDayCounter</a>(s: str)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/daycounters.py#L64">qlDayCounter</a>(daycounter_name: str, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/daycounters.py#L76">qlDayCounterDayCount</a>(daycounter: qDayCounter, start_date: qDate, end_date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/daycounters.py#L91">qlDayCounterYearFraction</a>(daycounter: qDayCounter, start_date: qDate, end_date: qDate, ref_start_date: qDate = ql.Date(), ref_end_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/daycounters.py#L101">qlDayCounterName</a>(daycounter: qDayCounter, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/daycounters.py#L110">qlDayCounterEmpty</a>(daycounter: qDayCounter, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/daycounters.py#L123">qlDayCounterYearFractionToDate</a>(daycounter: qDayCounter, ref_date: qDate, year_fraction: float, trigger = None)</p>
+</section>
+<section id="indexes">
+<h2>Indexes<a class="headerlink" href="#indexes" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L16">qlIndexManagerHistories</a>(trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L23">qlIndexManagerClearHistories</a>(trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L36">qlIndexName</a>(index: ql.Index, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L47">qlIndexFixingCalendar</a>(index: ql.Index, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L59">qlIndexIsValidFixingDate</a>(index: ql.Index, date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L71">qlIndexHasHistoricalFixing</a>(index: ql.Index, date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L84">qlIndexFixing</a>(index: ql.Index, date: qDate, forecast_todays_fixing = False, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L96">qlIndexPastFixing</a>(index: ql.Index, date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L110">qlIndexAddFixing</a>(index: ql.Index, date: qDate, value: float, force_overwrite: bool = False, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L125">qlIndexAddFixings</a>(index: ql.Index, dates: xlo.Array(dims=1), values: xlo.Array(dims=1), force_overwrite: bool = False, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L145">qlIndexTimeSeries</a>(index: ql.Index, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L156">qlIndexClearFixings</a>(index: ql.Index, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L170">qlInterestRateIndexFamilyName</a>(index: ql.InterestRateIndex, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L181">qlInterestRateIndexTenor</a>(index: ql.InterestRateIndex, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L192">qlInterestRateIndexFixingDays</a>(index: ql.InterestRateIndex, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L204">qlInterestRateIndexFixingDate</a>(index: ql.InterestRateIndex, value_date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L215">qlInterestRateIndexCurrency</a>(index: ql.InterestRateIndex, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L226">qlInterestRateIndexDayCounter</a>(index: ql.InterestRateIndex, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L238">qlInterestRateIndexMaturityDate</a>(index: ql.InterestRateIndex, value_date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L250">qlInterestRateIndexValueDate</a>(index: ql.InterestRateIndex, fixing_date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L272">qlIborIndex</a>(family_name: str, tenor: qPeriod, settlement_days: int, currency: qCurrency, calendar: qCalendar, convention: qBusinessDayConvention, end_of_month: bool, day_counter: qDayCounter, projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L305">qlCdor</a>(tenor: qPeriod, projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L316">qlBbsw</a>(tenor: qPeriod, projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L327">qlBkbm</a>(tenor: qPeriod, projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L338">qlEuribor</a>(tenor: qPeriod, projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L349">qlEuribor365</a>(tenor: qPeriod, projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L360">qlJibar</a>(tenor: qPeriod, projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L371">qlMosprime</a>(tenor: qPeriod, projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L382">qlNZDLibor</a>(tenor: qPeriod, projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L393">qlPribor</a>(tenor: qPeriod, projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L404">qlRobor</a>(tenor: qPeriod, projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L415">qlShibor</a>(tenor: qPeriod, projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L426">qlTibor</a>(tenor: qPeriod, projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L437">qlTHBFIX</a>(tenor: qPeriod, projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L448">qlWibor</a>(tenor: qPeriod, projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L459">qlZibor</a>(tenor: qPeriod, projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L470">qlAUDLibor</a>(tenor: qPeriod, projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L481">qlCADLibor</a>(tenor: qPeriod, projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L492">qlCHFLibor</a>(tenor: qPeriod, projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L503">qlDKKLibor</a>(tenor: qPeriod, projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L514">qlEURLibor</a>(tenor: qPeriod, projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L525">qlGBPLibor</a>(tenor: qPeriod, projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L536">qlJPYLibor</a>(tenor: qPeriod, projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L547">qlSEKLibor</a>(tenor: qPeriod, projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L558">qlTRLibor</a>(tenor: qPeriod, projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L569">qlUSDLibor</a>(tenor: qPeriod, projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L587">qlOvernightIndex</a>(family_name: str, settlement_days: int, currency: qCurrency, calendar: qCalendar, day_counter: qDayCounter, projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L612">qlAonia</a>(projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L622">qlCdi</a>(projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L632">qlCorra</a>(projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L642">qlDestr</a>(projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L652">qlEonia</a>(projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L662">qlEstr</a>(projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L672">qlFedFunds</a>(projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L682">qlKofr</a>(projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L692">qlNzocr</a>(projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L702">qlSaron</a>(projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L712">qlSofr</a>(projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L722">qlSonia</a>(projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L732">qlSwestr</a>(projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L742">qlTonar</a>(projection_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L764">qlSwapIndex</a>(family_name: str, tenor: qPeriod, settlement_days: int, currency: qCurrency, calendar: qCalendar, fixed_leg_tenor: qPeriod, fixed_leg_convention: qBusinessDayConvention, fixed_leg_day_counter: qDayCounter, ibor_index: ql.IborIndex, discount_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L812">qlEuriborSwapIsdaFixA</a>(swap_tenor: qPeriod, proj_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), discount_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L827">qlEuriborSwapIsdaFixB</a>(swap_tenor: qPeriod, proj_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), discount_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L842">qlEuriborSwapIfrFix</a>(swap_tenor: qPeriod, proj_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), discount_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L857">qlEurLiborSwapIsdaFixA</a>(swap_tenor: qPeriod, proj_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), discount_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L872">qlEurLiborSwapIsdaFixB</a>(swap_tenor: qPeriod, proj_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), discount_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L887">qlEurLiborSwapIfrFix</a>(swap_tenor: qPeriod, proj_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), discount_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L902">qlChfLiborSwapIsdaFix</a>(swap_tenor: qPeriod, proj_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), discount_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L917">qlGbpLiborSwapIsdaFix</a>(swap_tenor: qPeriod, proj_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), discount_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L932">qlJpyLiborSwapIsdaFixAm</a>(swap_tenor: qPeriod, proj_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), discount_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L947">qlJpyLiborSwapIsdaFixPm</a>(swap_tenor: qPeriod, proj_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), discount_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L962">qlUsdLiborSwapIsdaFixAm</a>(swap_tenor: qPeriod, proj_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), discount_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L977">qlUsdLiborSwapIsdaFixPm</a>(swap_tenor: qPeriod, proj_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), discount_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L997">qlSwapSpreadIndex</a>(family_name: str, swap_index1: ql.SwapIndex, swap_index2: ql.SwapIndex, gearing1: float = 1.0, gearing2: float = -1.0, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L1015">qlSwapIndexForecastFixing</a>(swap_index: ql.SwapIndex, fixing_date: qDate)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/indexes.py#L1033">qlEquityIndex</a>(name: str, fixing_calendar: qCalendar, currency: qCurrency, spot_price: float, disc_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), div_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+</section>
+<section id="interpolatedyieldcurves">
+<h2>Interpolatedyieldcurves<a class="headerlink" href="#interpolatedyieldcurves" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/interpolatedyieldcurves.py#L62">qlInterpolatedYieldCurve</a>(dates: xlo.Array(dims=1), discounts: xlo.Array(dims=1), daycounter: qDayCounter, calendar: qCalendar, traits: str, interpolator: str, mixed_interpolation_behavior: str = None, mixed_interpolation_n: int = None, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/interpolatedyieldcurves.py#L103">qlDiscountCurve</a>(dates: xlo.Array(dims=1), discounts: xlo.Array(dims=1), daycounter: qDayCounter = ql.Actual365Fixed(), calendar: qCalendar = ql.NullCalendar(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/interpolatedyieldcurves.py#L125">qlForwardCurve</a>(dates: xlo.Array(dims=1), forwards: xlo.Array(dims=1), daycounter: qDayCounter = ql.Actual365Fixed(), calendar: qCalendar = ql.NullCalendar(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/interpolatedyieldcurves.py#L147">qlZeroCurve</a>(dates: xlo.Array(dims=1), zerorates: xlo.Array(dims=1), daycounter: qDayCounter = ql.Actual365Fixed(), calendar: qCalendar = ql.NullCalendar(), trigger = None)</p>
+</section>
+<section id="piecewiseyieldcurve">
+<h2>Piecewiseyieldcurve<a class="headerlink" href="#piecewiseyieldcurve" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/piecewiseyieldcurve.py#L53">qlYieldTermStructureHandle</a>(curve: ql.YieldTermStructure, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/piecewiseyieldcurve.py#L70">qlPiecewiseYieldCurveDates</a>(curve: ql.YieldTermStructure, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/piecewiseyieldcurve.py#L84">qlPiecewiseYieldCurveTimes</a>(curve: ql.YieldTermStructure, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/piecewiseyieldcurve.py#L98">qlPiecewiseYieldCurveData</a>(curve: ql.YieldTermStructure, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/piecewiseyieldcurve.py#L118">qlPiecewiseYieldCurveAsYts</a>(reference_date: qDate, instruments: xlo.Array(dims=1), daycounter: qDayCounter, traits: str, interpolator: str, mixed_interpolation_behavior: str = None, mixed_interpolation_n: int = None, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/piecewiseyieldcurve.py#L160">qlPiecewiseYieldCurve</a>(reference_date: qDate, instruments: xlo.Array(dims=1), daycounter: qDayCounter, traits: str, interpolator: str, mixed_interpolation_behavior: str = None, mixed_interpolation_n: int = None, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/piecewiseyieldcurve.py#L198">qlPiecewiseYieldCurveWithJumpsAsYts</a>(reference_date: qDate, instruments: xlo.Array(dims=1), daycounter: qDayCounter, jumps: xlo.Array(dims=1), jump_dates: xlo.Array(dims=1), traits: str, interpolator: str, mixed_interpolation_behavior: str = None, mixed_interpolation_n: int = None, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/piecewiseyieldcurve.py#L247">qlPiecewiseYieldCurveWithJumps</a>(reference_date: qDate, instruments: xlo.Array(dims=1), daycounter: qDayCounter, jumps: xlo.Array(dims=1), jump_dates: xlo.Array(dims=1), traits: str, interpolator: str, mixed_interpolation_behavior: str = None, mixed_interpolation_n: int = None, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/piecewiseyieldcurve.py#L286">qlPiecewiseSpreadYieldCurveAsYts</a>(base_curve: ql.YieldTermStructureHandle, instruments: xlo.Array(dims=1), traits: str, interpolator: str, mixed_interpolation_behavior: str = None, mixed_interpolation_n: int = None, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/piecewiseyieldcurve.py#L326">qlPiecewiseSpreadYieldCurve</a>(base_curve: ql.YieldTermStructureHandle, instruments: xlo.Array(dims=1), traits: str, interpolator: str, mixed_interpolation_behavior: str = None, mixed_interpolation_n: int = None, trigger = None)</p>
+</section>
+<section id="quantlib">
+<h2>Quantlib_<a class="headerlink" href="#quantlib" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/quantlib_.py#L12">qlVersion</a>(trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/quantlib_.py#L20">qlHexVersion</a>(trigger = None)</p>
+</section>
+<section id="ratehelpers">
+<h2>Ratehelpers<a class="headerlink" href="#ratehelpers" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L28">qPillarChoice</a>(s: str)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L35">qFuturesType</a>(s: str)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L39">qQuoteHandle</a>(rate: str)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L57">qlRateHelperQuote</a>(rate_helper: ql.RateHelper, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L67">qlRateHelperLatestDate</a>(rate_helper: ql.RateHelper, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L77">qlRateHelperEarliestDate</a>(rate_helper: ql.RateHelper, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L87">qlRateHelperMaturityDate</a>(rate_helper: ql.RateHelper, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L97">qlRateHelperLatestRelevantDate</a>(rate_helper: ql.RateHelper, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L107">qlRateHelperPillarDate</a>(rate_helper: ql.RateHelper, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L118">qlRateHelperImpliedQuote</a>(rate_helper: ql.RateHelper, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L129">qlRateHelperQuoteError</a>(rate_helper: ql.RateHelper, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L145">qlDepositRateHelper</a>(rate: qQuoteHandle, tenor: qPeriod, fixing_days: int, calendar: qCalendar, business_day_convention: qBusinessDayConvention, end_of_month: bool, daycounter: qDayCounter, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L173">qlDepositRateHelper2</a>(rate: qQuoteHandle, index: ql.IborIndex, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L192">qlDepositRateHelper3</a>(rate: qQuoteHandle, fixing_date: qDate, index: ql.IborIndex, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L221">qlFRARateHelper</a>(rate: qQuoteHandle, month_to_start: int, month_to_end: int, fixing_days: int, calendar: qCalendar, business_day_convention: qBusinessDayConvention, end_of_month: bool, day_counter: qDayCounter, pillar: qPillarChoice = ql.Pillar.LastRelevantDate, custom_pillar_date: qDate = ql.Date(), use_indexed_coupon: bool = True, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L261">qlFRARateHelper2</a>(rate: qQuoteHandle, month_to_start: int, index: ql.IborIndex, pillar: qPillarChoice = ql.Pillar.LastRelevantDate, custom_pillar_date: qDate = ql.Date(), use_indexed_coupon: bool = True, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L292">qlFRARateHelper3</a>(rate: qQuoteHandle, imm_offset_start: int, imm_offset_end: int, index: ql.IborIndex, pillar: qPillarChoice = ql.Pillar.LastRelevantDate, custom_pillar_date: qDate = ql.Date(), use_indexed_coupon: bool = True, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L324">qlFRARateHelper4</a>(rate: qQuoteHandle, period_to_start: qPeriod, index: ql.IborIndex, pillar: qPillarChoice = ql.Pillar.LastRelevantDate, custom_pillar_date: qDate = ql.Date(), use_indexed_coupon: bool = True, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L356">qlFRARateHelperForDates</a>(rate: qQuoteHandle, start_date: qDate, end_date: qDate, index: ql.IborIndex, pillar: qPillarChoice = ql.Pillar.LastRelevantDate, custom_pillar_date: qDate = ql.Date(), use_indexed_coupon: bool = True, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L391">qlFuturesRateHelper</a>(price: qQuoteHandle, ibor_start_date: qDate, n_months: int, calendar: qCalendar, business_day_convention: qBusinessDayConvention, end_of_month: bool, day_counter: qDayCounter, convexity_adjustment: qQuoteHandle = ql.QuoteHandle(), type: qFuturesType = ql.IMM, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L427">qlFuturesRateHelper2</a>(price: qQuoteHandle, ibor_start_date: qDate, ibor_end_date: qDate, day_counter: qDayCounter, convexity_adjustment: qQuoteHandle = ql.QuoteHandle(), type: qFuturesType = ql.IMM, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L456">qlFuturesRateHelper3</a>(price: qQuoteHandle, ibor_start_date: qDate, index: ql.IborIndex, convexity_adjustment: qQuoteHandle = ql.QuoteHandle(), type: qFuturesType = ql.IMM, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L479">qlFuturesRateConvexityAdjustment</a>(futures_rate_helper: ql.FuturesRateHelper, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L503">qlSwapRateHelper</a>(rate: qQuoteHandle, tenor: qPeriod, calendar: qCalendar, fixed_frequency: qFrequency, fixed_convention: qBusinessDayConvention, fixed_daycount: qDayCounter, ibor_index: ql.IborIndex, spread: float = 0.0, fwd_start: qPeriod = ql.Period(0, ql.Days), discounting_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), settlement_days: int = 0, pillar: qPillarChoice = ql.Pillar.LastRelevantDate, custom_pillar_date: qDate = ql.Date(), end_of_month: bool = False, with_indexed_coupons: bool = False, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L555">qlSwapRateHelper2</a>(rate: qQuoteHandle, index: ql.SwapIndex, spread: float = 0.0, fwd_start: qPeriod = ql.Period(0, ql.Days), discounting_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), pillar: qPillarChoice = ql.Pillar.LastRelevantDate, custom_pillar_date: qDate = ql.Date(), end_of_month: bool = False, with_indexed_coupons: bool = False, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L602">qlSwapRateForDates</a>(rate: qQuoteHandle, start_date: qDate, end_date: qDate, calendar: qCalendar, fixed_frequencies: qFrequency, business_day_convention: qBusinessDayConvention, day_counter: qDayCounter, index: ql.IborIndex, spread: float = 0.0, discounting_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), pillar: ql.Pillar = ql.Pillar.LastRelevantDate, custom_pillar_date: qDate = ql.Date(), end_of_month: bool = False, with_indexed_coupons: bool = False, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L643">qlSwapRateHelperSpread</a>(swap_rate_helper: ql.SwapRateHelper, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L653">qlSwapRateHelperSwap</a>(swap_rate_helper: ql.SwapRateHelper, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L762">qlOISRateHelper</a>(settlement_days: int, tenor: qPeriod, fixed_rate: qQuoteHandle, overnight_index: ql.OvernightIndex, discounting_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), telescopic_value_dates: bool = False, payment_lag: int = 0, payment_convention: qBusinessDayConvention = ql.Following, payment_frequency: qFrequency = ql.Annual, payment_calendar: qCalendar = ql.NullCalendar(), forward_start: qPeriod = ql.Period(0, ql.Days), overnight_spread: float = 0.0, pillar: qPillarChoice = ql.Pillar.LastRelevantDate, custom_pillar_date: qDate = ql.Date(), averaging_method: qRateAveragingType = ql.RateAveraging.Compound, end_of_month: bool = None, fixed_payment_frequency: qFrequency = ql.NoFrequency, fixed_calendar: qCalendar = ql.NullCalendar(), look_back_days: int = 0, lock_out_days: int = 0, apply_observation_shift: bool = False, pricer: ql.FloatingRateCouponPricer = None, rule: qDateGenerationRule = ql.DateGeneration.Backward, overnight_calendar: qCalendar = ql.NullCalendar(), convention: qBusinessDayConvention = ql.ModifiedFollowing, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L912">qlOISRateHelperSwap</a>(ois_rate_helper: ql.OISRateHelper, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L932">qlFxSwapRateHelper</a>(fwd_point: qQuoteHandle, spot_fx: qQuoteHandle, tenor: qPeriod, fixing_days: int, calendar: qCalendar, business_day_convention: qBusinessDayConvention, end_of_month: bool, is_fx_base_currency_collateral_currency: bool, collateral_curve: ql.YieldTermStructureHandle, trading_calendar: qCalendar = ql.NullCalendar(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L971">qlFxSwapRateHelperForDates</a>(fwd_point: qQuoteHandle, spot_fx: qQuoteHandle, start_date: qDate, end_date: qDate, is_fx_base_currency_collateral_currency: bool, collateral_curve: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L996">qlFxSwapRateHelperSpot</a>(fx_swap_rate_helper: ql.FxSwapRateHelper, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L1006">qlFxSwapRateHelperTenor</a>(fx_swap_rate_helper: ql.FxSwapRateHelper, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L1016">qlFxSwapRateHelperFixingDays</a>(fx_swap_rate_helper: ql.FxSwapRateHelper, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L1026">qlFxSwapRateHelperCalendar</a>(fx_swap_rate_helper: ql.FxSwapRateHelper, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L1037">qlFxSwapRateHelperBusinessDayConvention</a>(fx_swap_rate_helper: ql.FxSwapRateHelper, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L1047">qlFxSwapRateHelperEndOfMonth</a>(fx_swap_rate_helper: ql.FxSwapRateHelper, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L1057">qlFxSwapRateHelperIsFxBaseCurrencyCollateralCurrency</a>(fx_swap_rate_helper: ql.FxSwapRateHelper, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L1067">qlFxSwapRateHelperTradingCalendar</a>(fx_swap_rate_helper: ql.FxSwapRateHelper, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L1077">qlFxSwapRateHelperAdjustmentCalendar</a>(fx_swap_rate_helper: ql.FxSwapRateHelper, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L1092">qlOvernightIndexFutureRateHelper</a>(price: qQuoteHandle, value_date: qDate, maturity_date: qDate, index: ql.OvernightIndex, convexity_adjustment: qQuoteHandle = ql.QuoteHandle(), averaging_method: qRateAveragingType = ql.RateAveraging.Compound, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L1117">qlOvernightIndexFutureRateHelperConvexityAdjustment</a>(overnight_index_future_rate_helper: ql.OvernightIndexFutureRateHelper, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L1133">qlSofrFutureRateHelper</a>(price: qQuoteHandle, reference_month: int, reference_year: int, frequency: qFrequency, convexity_adjustment: qQuoteHandle = ql.QuoteHandle(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L1167">qlConstNotionalCrossCurrencySwapRateHelper</a>(fixed_rate: qQuoteHandle, tenor: qPeriod, fixing_days: int, calendar: qCalendar, convention: qBusinessDayConvention, end_of_month: bool, fixed_frequency: qFrequency, fixed_day_count: qDayCounter, float_index: ql.IborIndex, collateral_curve: ql.YieldTermStructureHandle, collateral_on_fixed_leg: bool, payment_lag: int = 0, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L1216">qlConstNotionalCrossCurrencyBasisSwapRateHelper</a>(basis: qQuoteHandle, tenor: qPeriod, fixing_days: int, calendar: qCalendar, convention: qBusinessDayConvention, end_of_month: bool, base_currency_index: ql.IborIndex, quote_currency_index: ql.IborIndex, collateral_curve: ql.YieldTermStructureHandle, is_fx_base_currency_collateral_currency: bool, is_basis_on_fx_base_currency_leg: bool, payment_frequency: qFrequency = ql.NoFrequency, payment_lag: int = 0, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L1268">qlMtMCrossCurrencyBasisSwapRateHelper</a>(basis: qQuoteHandle, tenor: qPeriod, fixing_days: int, calendar: qCalendar, convention: qBusinessDayConvention, end_of_month: bool, base_currency_index: ql.IborIndex, quote_currency_index: ql.IborIndex, collateral_curve: ql.YieldTermStructureHandle, is_fx_base_currency_collateral_currency: bool, is_basis_on_fx_base_currency_leg: bool, is_fx_base_currency_leg_resettable: bool, payment_frequency: qFrequency = ql.NoFrequency, payment_lag: int = 0, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L1318">qlIborIborBasisSwapRateHelper</a>(basis: qQuoteHandle, tenor: qPeriod, settlement_days: int, calendar: qCalendar, convention: qBusinessDayConvention, end_of_month: bool, base_index: ql.IborIndex, other_index: ql.IborIndex, discount_handle: ql.YieldTermStructureHandle, bootstrap_base_curve: bool, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L1351">qlIborIborBasisSwapRateHelperSwap</a>(ibor_ibor_basis_swap_rate_helper: ql.IborIborBasisSwapRateHelper, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L1369">qlOvernightIborBasisSwapRateHelper</a>(basis: qQuoteHandle, tenor: qPeriod, settlement_days: int, calendar: qCalendar, convention: qBusinessDayConvention, end_of_month: bool, base_index: ql.IborIndex, other_index: ql.IborIndex, discount_handle: ql.YieldTermStructureHandle, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/ratehelpers.py#L1400">qlOvernightIborBasisSwapRateHelperSwap</a>(overnight_ibor_basis_swap_rate_helper: ql.OvernightIborBasisSwapRateHelper, trigger = None)</p>
+</section>
+<section id="rounding">
+<h2>Rounding<a class="headerlink" href="#rounding" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/rounding.py#L24">qRoundingMethod</a>(method: str)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/rounding.py#L37">qlRounding</a>(method: qRoundingMethod, precision: int, digit: int = 5, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/rounding.py#L49">qlRoundingApply</a>(rounding: ql.Rounding, value: float, trigger = None)</p>
+</section>
+<section id="scheduler">
+<h2>Scheduler<a class="headerlink" href="#scheduler" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/scheduler.py#L33">qDateGenerationRule</a>(rule: str)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/scheduler.py#L53">qlSchedule</a>(effective_date: qDate, termination_date: qDate, tenor: qPeriod, calendar: qCalendar, convention: qBusinessDayConvention, termination_date_convention: qBusinessDayConvention, date_generation_rule: qDateGenerationRule, end_of_month: bool, first_date: qDate = ql.Date(), last_date: qDate = ql.Date(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/scheduler.py#L89">qlScheduleFromDates</a>(dates: xlo.Array(dims=1), calendar: qCalendar = ql.NullCalendar(), convention: qBusinessDayConvention = ql.Unadjusted, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/scheduler.py#L110">qlScheduleDates</a>(schedule: ql.Schedule, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/scheduler.py#L122">qlSchedulePreviousDate</a>(schedule: ql.Schedule, ref_date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/scheduler.py#L134">qlScheduleNextDate</a>(schedule: ql.Schedule, ref_date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/scheduler.py#L145">qlScheduleHasIsRegular</a>(schedule: ql.Schedule, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/scheduler.py#L157">qlScheduleIsRegular</a>(schedule: ql.Schedule, i: int, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/scheduler.py#L168">qlScheduleIsRegular2</a>(schedule: ql.Schedule, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/scheduler.py#L179">qlScheduleCalendar</a>(schedule: ql.Schedule, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/scheduler.py#L190">qlScheduleStartDate</a>(schedule: ql.Schedule, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/scheduler.py#L201">qlScheduleEndDate</a>(schedule: ql.Schedule, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/scheduler.py#L212">qlScheduleHasTenor</a>(schedule: ql.Schedule, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/scheduler.py#L223">qlScheduleTenor</a>(schedule: ql.Schedule, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/scheduler.py#L234">qlScheduleBusinessDayConvention</a>(schedule: ql.Schedule, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/scheduler.py#L245">qlScheduleHasTerminationDateBusinessDayConvention</a>(schedule: ql.Schedule, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/scheduler.py#L256">qlScheduleTerminationDateBusinessDayConvention</a>(schedule: ql.Schedule, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/scheduler.py#L267">qlScheduleHasRule</a>(schedule: ql.Schedule, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/scheduler.py#L278">qlScheduleRule</a>(schedule: ql.Schedule, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/scheduler.py#L289">qlScheduleHasEndOfMonth</a>(schedule: ql.Schedule, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/scheduler.py#L300">qlScheduleEndOfMonth</a>(schedule: ql.Schedule, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/scheduler.py#L312">qlScheduleAfter</a>(schedule: ql.Schedule, truncation_date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/scheduler.py#L324">qlScheduleUntil</a>(schedule: ql.Schedule, truncation_date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/scheduler.py#L347">qlMakeSchedule</a>(effective_date = None, termination_date = None, tenor = None, frequency = None, calendar = None, convention = None, terminal_date_convention = None, rule = None, forwards = False, backwards = False, end_of_month = None, first_date = None, next_to_last_date = None, trigger = None)</p>
+</section>
+<section id="settings">
+<h2>Settings<a class="headerlink" href="#settings" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/settings.py#L11">qlSettingsGetEvaluationDate</a>(trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/settings.py#L21">qlSettingsSetEvaluationDate</a>(date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/settings.py#L29">qlSettingsGetEnforcesTodaysHistoricFixings</a>(trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/settings.py#L39">qlSettingsSetEnforcesTodaysHistoricFixings</a>(enforces: bool, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/settings.py#L47">qlSettingsGetIncludeReferenceDateEvents</a>(trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/settings.py#L57">qlSettingsSetIncludeReferenceDateEvents</a>(include: bool, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/settings.py#L65">qlSettingsGetIncludeTodaysCashFlows</a>(trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/settings.py#L75">qlSettingsSetIncludeTodaysCashFlows</a>(include: bool, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/settings.py#L83">qlSettingsAnchorEvaluationDate</a>(trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/settings.py#L91">qlSettingsResetEvaluationDate</a>(trigger = None)</p>
+</section>
+<section id="termstructures">
+<h2>Termstructures<a class="headerlink" href="#termstructures" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/termstructures.py#L21">qlTermStructureDayCounter</a>(ytsh: ql.YieldTermStructureHandle, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/termstructures.py#L32">qlTermStructureTimeFromReference</a>(ytsh: ql.YieldTermStructureHandle, date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/termstructures.py#L42">qlTermStructureCalendar</a>(ytsh: ql.YieldTermStructureHandle, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/termstructures.py#L52">qlTermStructureReferenceDate</a>(ytsh: ql.YieldTermStructureHandle, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/termstructures.py#L62">qlTermStructureMaxDate</a>(ytsh: ql.YieldTermStructureHandle, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/termstructures.py#L72">qlTermStructureMaxTime</a>(ytsh: ql.YieldTermStructureHandle)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/termstructures.py#L82">qlTermStructureEnableExrapolation</a>(ytsh: ql.YieldTermStructureHandle, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/termstructures.py#L93">qlTermStructureDisableExrapolation</a>(ytsh: ql.YieldTermStructureHandle, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/termstructures.py#L104">qlTermStructureAllowsExtrapolation</a>(ytsh: ql.YieldTermStructureHandle, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/termstructures.py#L124">qCompounding</a>(compounding: str)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/termstructures.py#L136">qlYieldTermStructureDiscount</a>(ytsh: ql.YieldTermStructureHandle, date: qDate, extrapolate: bool = False, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/termstructures.py#L153">qlYieldTermStructureDiscountFromTime</a>(ytsh: ql.YieldTermStructureHandle, time: float, extrapolate: bool = False, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/termstructures.py#L173">qlYieldTermStructureZeroRate</a>(ytsh: ql.YieldTermStructureHandle, date: qDate, daycounter: qDayCounter, compounding: qCompounding, frequency: qFrequency, extrapolate: bool = False, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/termstructures.py#L195">qlYieldTermStructureZeroRateFromTime</a>(ytsh: ql.YieldTermStructureHandle, time: float, compounding: qCompounding, frequency: qFrequency, extrapolate: bool = False, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/termstructures.py#L218">qlYieldTermStructureForwardRate</a>(ytsh: ql.YieldTermStructureHandle, date1: qDate, date2: qDate, daycounter: qDayCounter, compounding: qCompounding, frequency: qFrequency, extrapolate: bool = False, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/termstructures.py#L242">qlYieldTermStructureForwardRateFromTime</a>(ytsh: ql.YieldTermStructureHandle, time1: float, time2: float, compounding: qCompounding, frequency: qFrequency, extrapolate: bool = False, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/termstructures.py#L268">qlFlatForward</a>(reference_date: qDate, forward_rate: float, daycounter: qDayCounter = ql.Actual365Fixed(), compounding: qCompounding = ql.Compounded, frequency: qFrequency = ql.NoFrequency, calendar: qCalendar = ql.NullCalendar(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/termstructures.py#L291">qlImpliedTermStructure</a>(ytsh: ql.YieldTermStructureHandle, reference_date: qDate, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/termstructures.py#L312">qlZeroSpreadedTermStructure</a>(base: ql.YieldTermStructureHandle, spread: float, compounding: qCompounding = ql.Compounded, frequency: qFrequency = ql.NoFrequency, daycounter: qDayCounter = ql.Actual365Fixed(), trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/termstructures.py#L333">qlForwardSpreadedTermStructure</a>(base: ql.YieldTermStructureHandle, spread: float, trigger = None)</p>
+<p><a class="reference external" href="https://github.com/frame-consulting/QuantLibXlOil/blob/main/src/quantlib_xloil/termstructures.py#L357">qlCompositeZeroYieldStructure</a>(curve1: ql.YieldTermStructureHandle, curve2: ql.YieldTermStructureHandle, operator: str, trigger = None)</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="04_adding_functions.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Adding Own Functions</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="02_example_sheets.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Example Sheets</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026, Sebastian Schlenkrich
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">API Reference</a><ul>
+<li><a class="reference internal" href="#calendars">Calendars</a></li>
+<li><a class="reference internal" href="#cashflows">Cashflows</a></li>
+<li><a class="reference internal" href="#currencies">Currencies</a></li>
+<li><a class="reference internal" href="#date">Date</a></li>
+<li><a class="reference internal" href="#daycounters">Daycounters</a></li>
+<li><a class="reference internal" href="#indexes">Indexes</a></li>
+<li><a class="reference internal" href="#interpolatedyieldcurves">Interpolatedyieldcurves</a></li>
+<li><a class="reference internal" href="#piecewiseyieldcurve">Piecewiseyieldcurve</a></li>
+<li><a class="reference internal" href="#quantlib">Quantlib_</a></li>
+<li><a class="reference internal" href="#ratehelpers">Ratehelpers</a></li>
+<li><a class="reference internal" href="#rounding">Rounding</a></li>
+<li><a class="reference internal" href="#scheduler">Scheduler</a></li>
+<li><a class="reference internal" href="#settings">Settings</a></li>
+<li><a class="reference internal" href="#termstructures">Termstructures</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>
