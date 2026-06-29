@@ -6,6 +6,7 @@ from quantlib_xloil.calendars import *
 from quantlib_xloil.calibratedmodel import *
 from quantlib_xloil.calibrationhelpers import *
 from quantlib_xloil.cashflows import *
+from quantlib_xloil.cashflowanalysis import *
 from quantlib_xloil.credit import *
 from quantlib_xloil.creditdefaultswap import *
 from quantlib_xloil.currencies import *
