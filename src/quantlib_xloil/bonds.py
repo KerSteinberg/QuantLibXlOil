@@ -695,13 +695,30 @@ def qlFixedRateBond(
     business_day_convention: qBusinessDayConvention = ql.Following,
     redemption: float = 100.0,
     issue_date: qDate = ql.Date(),
-    payment_calendar: qCalendar = ql.NullCalendar(),
+    payment_calendar=None,
     ex_coupon_period: qPeriod = ql.Period(),
-    ex_coupon_calendar: qCalendar = ql.NullCalendar(),
+    ex_coupon_calendar=None,
     ex_coupon_convention: qBusinessDayConvention = ql.Unadjusted,
     ex_coupon_end_of_month: bool = False,
     trigger=None,
 ) -> ql.FixedRateBond:
+    if payment_calendar is not None:
+        payment_calendar = qCalendar.__wrapped__(payment_calendar)
+    if ex_coupon_calendar is not None:
+        ex_coupon_calendar = qCalendar.__wrapped__(ex_coupon_calendar)
+    _BOND_KWARGS = {
+        "payment_calendar": "paymentCalendar",
+        "ex_coupon_period": "exCouponPeriod",
+        "ex_coupon_calendar": "exCouponCalendar",
+        "ex_coupon_convention": "exCouponConvention",
+        "ex_coupon_end_of_month": "exCouponEndOfMonth",
+    }
+    kwargs = {}
+    for param_name, kw_name in _BOND_KWARGS.items():
+        value = locals()[param_name]
+        if value is not None:
+            kwargs[kw_name] = value
+
     return ql.FixedRateBond(
         settlement_days,
         face_amount,
@@ -711,11 +728,7 @@ def qlFixedRateBond(
         business_day_convention,
         redemption,
         issue_date,
-        payment_calendar,
-        ex_coupon_period,
-        ex_coupon_calendar,
-        ex_coupon_convention,
-        ex_coupon_end_of_month,
+        **kwargs,
     )
 
 
@@ -733,7 +746,7 @@ def qlFixedRateBond(
         "ex_coupon_calendar": "The calendar for ex-coupon dates.",
         "ex_coupon_convention": "The business day convention for ex-coupon dates.",
         "ex_coupon_end_of_month": "Whether to adjust ex-coupon dates to the end of the month.",
-        "redemption": "The list of redemption amounts (default: [100]).",
+        "redemptions": "The list of redemption amounts (default: [100]).",
     },
     group=EXCEL_GROUP_NAME,
 )
@@ -746,12 +759,28 @@ def qlAmortizingFixedRateBond(
     payment_convention: qBusinessDayConvention = ql.Following,
     issue_date: qDate = ql.Date(),
     ex_coupon_period: qPeriod = ql.Period(),
-    ex_coupon_calendar: qCalendar = ql.NullCalendar(),
+    ex_coupon_calendar=None,
     ex_coupon_convention: qBusinessDayConvention = ql.Unadjusted,
     ex_coupon_end_of_month: bool = False,
-    redemption=100,
+    redemptions=100,
     trigger=None,
 ) -> ql.AmortizingFixedRateBond:
+
+    if ex_coupon_calendar is not None:
+        ex_coupon_calendar = qCalendar.__wrapped__(ex_coupon_calendar)
+    redemptions = to_float_list(redemptions)
+    _BOND_KWARGS = {
+        "ex_coupon_calendar": "exCouponCalendar",
+        "ex_coupon_convention": "exCouponConvention",
+        "ex_coupon_end_of_month": "exCouponEndOfMonth",
+        "redemptions": "redemptions",
+    }
+    kwargs = {}
+    for param_name, kw_name in _BOND_KWARGS.items():
+        value = locals()[param_name]
+        if value is not None:
+            kwargs[kw_name] = value
+
     return ql.AmortizingFixedRateBond(
         settlement_days,
         to_float_list(notionals),
@@ -761,10 +790,7 @@ def qlAmortizingFixedRateBond(
         payment_convention,
         issue_date,
         ex_coupon_period,
-        ex_coupon_calendar,
-        ex_coupon_convention,
-        ex_coupon_end_of_month,
-        to_float_list(redemption),
+        **kwargs,
     )
 
 
@@ -816,6 +842,22 @@ def qlAmortizingFloatingRateBond(
     payment_lag: int = 0,
     trigger=None,
 ) -> ql.AmortizingFloatingRateBond:
+    if ex_coupon_calendar is not None:
+        ex_coupon_calendar = qCalendar.__wrapped__(ex_coupon_calendar)
+    redemptions = to_float_list(redemptions)
+    _BOND_KWARGS = {
+        "ex_coupon_calendar": "exCouponCalendar",
+        "ex_coupon_convention": "exCouponConvention",
+        "ex_coupon_end_of_month": "exCouponEndOfMonth",
+        "redemptions": "redemptions",
+        "payment_lag": "paymentLag",
+    }
+    kwargs = {}
+    for param_name, kw_name in _BOND_KWARGS.items():
+        value = locals()[param_name]
+        if value is not None:
+            kwargs[kw_name] = value
+
     return ql.AmortizingFloatingRateBond(
         settlement_days,
         to_float_list(notional),
@@ -831,11 +873,7 @@ def qlAmortizingFloatingRateBond(
         in_arrears,
         issue_date,
         ex_coupon_period,
-        ex_coupon_calendar,
-        ex_coupon_convention,
-        ex_coupon_end_of_month,
-        to_float_list(redemptions),
-        payment_lag,
+        **kwargs,
     )
 
 
@@ -881,12 +919,25 @@ def qlFloatingRateBond(
     redemption: float = 100.0,
     issue_date: qDate = ql.Date(),
     ex_coupon_period: qPeriod = ql.Period(),
-    ex_coupon_calendar: qCalendar = ql.NullCalendar(),
+    ex_coupon_calendar=None,
     ex_coupon_convention: qBusinessDayConvention = ql.Unadjusted,
     ex_coupon_end_of_month: bool = False,
     fixing_convention: qBusinessDayConvention = ql.Preceding,
     trigger=None,
 ) -> ql.FloatingRateBond:
+    if ex_coupon_calendar is not None:
+        ex_coupon_calendar = qCalendar.__wrapped__(ex_coupon_calendar)
+    _BOND_KWARGS = {
+        "ex_coupon_calendar": "exCouponCalendar",
+        "ex_coupon_convention": "exCouponConvention",
+        "ex_coupon_end_of_month": "exCouponEndOfMonth",
+        "fixing_convention": "fixingConvention",
+    }
+    kwargs = {}
+    for param_name, kw_name in _BOND_KWARGS.items():
+        value = locals()[param_name]
+        if value is not None:
+            kwargs[kw_name] = value
     return ql.FloatingRateBond(
         settlement_days,
         face_amount,
@@ -903,10 +954,7 @@ def qlFloatingRateBond(
         redemption,
         issue_date,
         ex_coupon_period,
-        ex_coupon_calendar,
-        ex_coupon_convention,
-        ex_coupon_end_of_month,
-        fixing_convention,
+        **kwargs,
     )
 
 
@@ -1244,11 +1292,23 @@ def qlCallableFixedRateBond(
     issue_date: qDate,
     put_call_schedule: xlo.Array(dims=1),
     ex_coupon_period: qPeriod = ql.Period(),
-    ex_coupon_calendar: qCalendar = ql.NullCalendar(),
+    ex_coupon_calendar=None,
     ex_coupon_convention: qBusinessDayConvention = ql.Unadjusted,
     ex_coupon_end_of_month: bool = False,
     trigger=None,
 ) -> ql.CallableFixedRateBond:
+    if ex_coupon_calendar is not None:
+        ex_coupon_calendar = qCalendar.__wrapped__(ex_coupon_calendar)
+    _BOND_KWARGS = {
+        "ex_coupon_calendar": "exCouponCalendar",
+        "ex_coupon_convention": "exCouponConvention",
+        "ex_coupon_end_of_month": "exCouponEndOfMonth",
+    }
+    kwargs = {}
+    for param_name, kw_name in _BOND_KWARGS.items():
+        value = locals()[param_name]
+        if value is not None:
+            kwargs[kw_name] = value
     return ql.CallableFixedRateBond(
         settlement_days,
         face_amount,
@@ -1260,9 +1320,7 @@ def qlCallableFixedRateBond(
         issue_date,
         to_object_list(put_call_schedule, ql.Callability),
         ex_coupon_period,
-        ex_coupon_calendar,
-        ex_coupon_convention,
-        ex_coupon_end_of_month,
+        **kwargs,
     )
 
 
