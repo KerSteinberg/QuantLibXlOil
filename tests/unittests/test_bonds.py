@@ -32,6 +32,7 @@ from quantlib_xloil.bonds import (
     qlBondPriceType,
     qlBondSettlementDate,
     qlBondSettlementDays,
+    qlCPIBond,
     qlDiscountingBondEngine,
     qlBondSettlementValue,
     qlBondSettlementValue2,
@@ -48,9 +49,17 @@ from quantlib_xloil.bonds import (
     qlZeroCouponBond,
 )
 from quantlib_xloil.calendars import qlCalendar
-from quantlib_xloil.date import qFrequency, qlDate
+from quantlib_xloil.currencies import qCurrency
+from quantlib_xloil.date import qFrequency, qPeriod, qlDate
 from quantlib_xloil.daycounters import qlDayCounter
+from quantlib_xloil.inflation import (
+    qCPIInterpolationType,
+    qlZeroInflationCurve,
+    qlZeroInflationIndex,
+    qlCustomRegion,
+)
 from quantlib_xloil.ratehelpers import qQuoteHandle
+from quantlib_xloil.scheduler import qDateGenerationRule
 from quantlib_xloil.termstructures import qCompounding
 
 
@@ -684,6 +693,94 @@ def test_callable_bond_with_tree_engine_clean_price():
         assert clean_price > 0.0
         assert clean_price < 120.0
         assert clean_price == pytest.approx(callable_bond.cleanPrice())
+
+    finally:
+        ql.Settings.instance().evaluationDate = original_eval
+
+
+def test_cpi_bond():
+    original_eval = ql.Settings.instance().evaluationDate
+    try:
+        eval_date = qlDate(2025, 1, 2)
+        ql.Settings.instance().evaluationDate = eval_date
+
+        reference_date = ql.Date(2, 1, 2025)
+        inflation_dates = [
+            ql.Date(2, 1, 2024),
+            ql.Date(2, 1, 2030),
+        ]
+        inflation_rates = [0.02, 0.02]
+
+        inflation_curve = qlZeroInflationCurve(
+            reference_date,
+            inflation_dates,
+            inflation_rates,
+            qFrequency.__wrapped__("ANNUAL"),
+            qlDayCounter("ACTUAL365FIXED"),
+        )
+
+        region = qlCustomRegion("TestRegion", "TR")
+        currency = qCurrency.__wrapped__("USD")
+        cpi_index = qlZeroInflationIndex(
+            "TEST-CPI",
+            region,
+            False,
+            qFrequency.__wrapped__("ANNUAL"),
+            qPeriod.__wrapped__("3M"),
+            currency,
+            inflation_curve,
+        )
+
+        cpi_index.addFixing(ql.Date(2, 1, 2024), 100, forceOverwrite=True)
+        start = qlDate(2025, 1, 2)
+        end = qlDate(2030, 1, 2)
+        schedule = ql.Schedule(
+            start,
+            end,
+            ql.Period(ql.Semiannual),
+            qlCalendar("TARGET"),
+            ql.Unadjusted,
+            ql.Unadjusted,
+            qDateGenerationRule.__wrapped__("BACKWARD"),
+            False,
+        )
+
+        settlement_days = 2
+        cpi_bond = qlCPIBond(
+            settlement_days,
+            face_amount=100.0,
+            growth_only=False,
+            base_cpi=100.0,
+            observation_lag=qPeriod.__wrapped__("3M"),
+            cpi_index=cpi_index,
+            observation_interpolation=qCPIInterpolationType.__wrapped__("LINEAR"),
+            schedule=schedule,
+            coupons=[0.03],
+            accrual_day_counter=qlDayCounter("ACTUAL365FIXED"),
+            payment_convention=ql.ModifiedFollowing,
+            issue_date=start,
+        )
+
+        day_counter = qlDayCounter("ACTUAL365FIXED")
+        discount_curve = ql.YieldTermStructureHandle(
+            ql.FlatForward(eval_date, 0.03, day_counter)
+        )
+
+        engine = qlDiscountingBondEngine(discount_curve)
+        cpi_bond.setPricingEngine(engine)
+        clean_price = qlBondCleanPrice(cpi_bond)
+
+        assert isinstance(cpi_bond, ql.CPIBond)
+        assert isinstance(engine, ql.DiscountingBondEngine)
+        assert isinstance(clean_price, float)
+        assert cpi_bond.settlementDays() == settlement_days
+        assert len(cpi_bond.cashflows()) > 0
+        assert qlBondSettlementDays(cpi_bond) == settlement_days
+        assert qlBondMaturityDate(cpi_bond) == end
+        assert qlBondIssueDate(cpi_bond) == start
+        assert clean_price > 0.0
+        assert clean_price < 200.0
+        assert clean_price == pytest.approx(cpi_bond.cleanPrice())
 
     finally:
         ql.Settings.instance().evaluationDate = original_eval
