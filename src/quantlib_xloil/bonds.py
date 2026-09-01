@@ -5,6 +5,7 @@ from .calendars import qBusinessDayConvention, qCalendar
 from .config import EXCEL_GROUP_NAME
 from .date import qDate, qFrequency, qPeriod
 from .daycounters import qDayCounter
+from .inflation import qCPIInterpolationType
 from .ratehelpers import qQuoteHandle
 from .termstructures import qCompounding
 from .utilities import (
@@ -1423,4 +1424,79 @@ def qlBlackCallableFixedRateBondEngine(
     )
 
 
-# TODO The implementation of qlCPIBond requires the implementation of inflation.py
+@xlo.func(
+    help="Create a QuantLib CPIBond object.",
+    args={
+        "settlement_days": "The number of settlement days after the trade date.",
+        "face_amount": "The face amount of the bond.",
+        "growth_only": "Whether the bond has growth-only CPI adjustments.",
+        "base_cpi": "The base CPI index value.",
+        "observation_lag": "The lag period for CPI observations.",
+        "cpi_index": "The zero inflation index.",
+        "observation_interpolation": 'The interpolation type for CPI observations (e.g., "LINEAR" or "FLAT").',
+        "schedule": "The schedule for coupon payments.",
+        "coupons": "The list of coupon rates.",
+        "accrual_day_counter": "The day counter for accrual calculations.",
+        "payment_convention": "The business day convention for payment dates (default: ModifiedFollowing).",
+        "issue_date": "The issue date of the bond (default: today).",
+        "payment_calendar": "The calendar for payment dates (default: NullCalendar).",
+        "ex_coupon_period": "The period for ex-coupon dates (default: empty period).",
+        "ex_coupon_calendar": "The calendar for ex-coupon dates (default: NullCalendar).",
+        "ex_coupon_convention": "The business day convention for ex-coupon dates (default: Unadjusted).",
+        "ex_coupon_end_of_month": "Whether to adjust ex-coupon dates to the end of the month (default: False).",
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlCPIBond(
+    settlement_days: int,
+    face_amount: float,
+    growth_only: bool,
+    base_cpi: float,
+    observation_lag: qPeriod,
+    cpi_index: ql.ZeroInflationIndex,
+    observation_interpolation: qCPIInterpolationType,
+    schedule: ql.Schedule,
+    coupons: xlo.Array(dims=1),
+    accrual_day_counter: qDayCounter,
+    payment_convention: qBusinessDayConvention = ql.ModifiedFollowing,
+    issue_date: qDate = ql.Date(),
+    payment_calendar=None,
+    ex_coupon_period: qPeriod = ql.Period(),
+    ex_coupon_calendar=None,
+    ex_coupon_convention: qBusinessDayConvention = ql.Unadjusted,
+    ex_coupon_end_of_month: bool = False,
+    trigger=None,
+) -> ql.CPIBond:
+    if payment_calendar is not None:
+        payment_calendar = qCalendar.__wrapped__(payment_calendar)
+    if ex_coupon_calendar is not None:
+        ex_coupon_calendar = qCalendar.__wrapped__(ex_coupon_calendar)
+
+    _BOND_KWARGS = {
+        "payment_calendar": "paymentCalendar",
+        "ex_coupon_period": "exCouponPeriod",
+        "ex_coupon_calendar": "exCouponCalendar",
+        "ex_coupon_convention": "exCouponConvention",
+        "ex_coupon_end_of_month": "exCouponEndOfMonth",
+    }
+    kwargs = {}
+    for param_name, kw_name in _BOND_KWARGS.items():
+        value = locals()[param_name]
+        if value is not None:
+            kwargs[kw_name] = value
+
+    return ql.CPIBond(
+        settlement_days,
+        face_amount,
+        growth_only,
+        base_cpi,
+        observation_lag,
+        cpi_index,
+        observation_interpolation,
+        schedule,
+        to_float_list(coupons),
+        accrual_day_counter,
+        payment_convention,
+        issue_date,
+        **kwargs,
+    )
