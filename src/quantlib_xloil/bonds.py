@@ -1368,7 +1368,40 @@ def qlCallableZeroCouponBond(
     )
 
 
-# TODO The implementation of qlTreeCallableFixedRateBondEngine I + II requires the implementation of shortratemodels.py
+@xlo.func(
+    help="Create a QuantLib TreeCallableFixedRateBondEngine object with time steps.",
+    args={
+        "model": "The short rate model.",
+        "time_steps": "The number of time steps.",
+        "term_structure": "The yield term structure handle (default: empty handle).",
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlTreeCallableFixedRateBondEngine(
+    model: ql.ShortRateModel,
+    time_steps: int,
+    term_structure: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(),
+    trigger=None,
+) -> ql.TreeCallableFixedRateBondEngine:
+    return ql.TreeCallableFixedRateBondEngine(model, time_steps, term_structure)
+
+
+@xlo.func(
+    help="Create a QuantLib TreeCallableFixedRateBondEngine object with a time grid.",
+    args={
+        "model": "The short rate model.",
+        "time_grid": "The time grid.",
+        "term_structure": "The yield term structure handle (default: empty handle).",
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlTreeCallableFixedRateBondEngine2(
+    model: ql.ShortRateModel,
+    time_grid: ql.TimeGrid,
+    term_structure: ql.YieldTermStructureHandle = ql.YieldTermStructureHandle(),
+    trigger=None,
+) -> ql.TreeCallableFixedRateBondEngine:
+    return ql.TreeCallableFixedRateBondEngine(model, time_grid, term_structure)
 
 
 @xlo.func(
