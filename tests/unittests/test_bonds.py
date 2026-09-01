@@ -43,6 +43,8 @@ from quantlib_xloil.bonds import (
     qlCallabilityType,
     qlFixedRateBond,
     qlFloatingRateBond,
+    qlTreeCallableFixedRateBondEngine,
+    qlTreeCallableFixedRateBondEngine2,
     qlZeroCouponBond,
 )
 from quantlib_xloil.calendars import qlCalendar
@@ -540,6 +542,148 @@ def test_callable_bond_implied_volatility_wrapper():
         assert isinstance(implied_vol_higher, float)
         assert implied_vol_higher >= 0.0
         assert implied_vol_higher == pytest.approx(higher_vol, rel=0.1)
+
+    finally:
+        ql.Settings.instance().evaluationDate = original_eval
+
+
+def test_tree_callable_fixed_rate_bond_engine_wrappers():
+    original_eval = ql.Settings.instance().evaluationDate
+    try:
+        eval_date = qlDate(2025, 1, 2)
+        ql.Settings.instance().evaluationDate = eval_date
+
+        day_counter = qlDayCounter("ACTUAL365FIXED")
+        curve_handle = ql.YieldTermStructureHandle(
+            ql.FlatForward(eval_date, 0.05, day_counter)
+        )
+
+        # Create a Hull-White short rate model for testing
+        mean_reversion = 0.03
+        volatility = 0.01
+        hw_model = ql.HullWhite(
+            curve_handle,
+            mean_reversion,
+            volatility,
+        )
+
+        engine_with_steps = qlTreeCallableFixedRateBondEngine(
+            hw_model,
+            time_steps=100,
+        )
+        assert isinstance(engine_with_steps, ql.TreeCallableFixedRateBondEngine)
+
+        engine_with_steps_and_ts = qlTreeCallableFixedRateBondEngine(
+            hw_model,
+            time_steps=50,
+            term_structure=curve_handle,
+        )
+        assert isinstance(engine_with_steps_and_ts, ql.TreeCallableFixedRateBondEngine)
+
+        end_time = 10.0
+        time_grid = ql.TimeGrid(end_time, 100)
+
+        engine_with_grid = qlTreeCallableFixedRateBondEngine2(
+            hw_model,
+            time_grid=time_grid,
+        )
+        assert isinstance(engine_with_grid, ql.TreeCallableFixedRateBondEngine)
+
+        engine_with_grid_and_ts = qlTreeCallableFixedRateBondEngine2(
+            hw_model,
+            time_grid=time_grid,
+            term_structure=curve_handle,
+        )
+        assert isinstance(engine_with_grid_and_ts, ql.TreeCallableFixedRateBondEngine)
+
+    finally:
+        ql.Settings.instance().evaluationDate = original_eval
+
+
+def test_callable_bond_with_tree_engine_clean_price():
+    original_eval = ql.Settings.instance().evaluationDate
+    try:
+        eval_date = qlDate(2025, 1, 2)
+        ql.Settings.instance().evaluationDate = eval_date
+
+        start = qlDate(2025, 1, 2)
+        end = qlDate(2030, 1, 2)
+        schedule = _fixed_schedule(start, end)
+        day_counter = qlDayCounter("ACTUAL365FIXED")
+
+        call_dates = [
+            qlDate(2026, 1, 2),
+            qlDate(2027, 1, 2),
+            qlDate(2028, 1, 2),
+            qlDate(2029, 1, 2),
+        ]
+        call_prices = [102.0, 101.5, 101.0, 100.5]
+        callabilities = []
+        for date, price in zip(call_dates, call_prices):
+            callability = qlCallability(
+                ql.BondPrice(price, ql.BondPrice.Clean),
+                qCallabilityType.__wrapped__("CALL"),
+                date,
+            )
+            callabilities.append(callability)
+
+        curve_handle = ql.YieldTermStructureHandle(
+            ql.FlatForward(eval_date, 0.04, day_counter)
+        )
+
+        callable_bond = qlCallableFixedRateBond(
+            2,
+            100.0,
+            schedule,
+            [0.05],
+            day_counter,
+            ql.Following,
+            100.0,
+            start,
+            callabilities,
+        )
+
+        cash_flow_dates = [cf.date() for cf in callable_bond.cashflows()]
+
+        mean_reversion = 0.05
+        volatility = 0.01
+        hw_model = ql.HullWhite(
+            curve_handle,
+            mean_reversion,
+            volatility,
+        )
+
+        all_times = [0.0]
+        call_dates_times = [
+            day_counter.yearFraction(eval_date, cd) for cd in call_dates
+        ]
+        cf_times = [day_counter.yearFraction(eval_date, d) for d in cash_flow_dates]
+        all_times = sorted(set(all_times + cf_times + call_dates_times))
+        if all_times:
+            max_time = all_times[-1]
+            n_additional = 100
+            additional_times = [
+                max_time + i * (0.5 / n_additional) for i in range(1, n_additional + 1)
+            ]
+            all_times = sorted(set(all_times + additional_times))
+        time_grid = ql.TimeGrid(all_times)
+
+        engine = qlTreeCallableFixedRateBondEngine2(
+            hw_model,
+            time_grid=time_grid,
+            term_structure=curve_handle,
+        )
+        callable_bond.setPricingEngine(engine)
+
+        clean_price = qlBondCleanPrice(callable_bond)
+
+        assert isinstance(callable_bond, ql.CallableFixedRateBond)
+        assert len(callabilities) == 4
+        assert isinstance(engine, ql.TreeCallableFixedRateBondEngine)
+        assert isinstance(clean_price, float)
+        assert clean_price > 0.0
+        assert clean_price < 120.0
+        assert clean_price == pytest.approx(callable_bond.cleanPrice())
 
     finally:
         ql.Settings.instance().evaluationDate = original_eval
