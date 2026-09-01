@@ -13,7 +13,6 @@ from .utilities import (
     first_key,
     to_float_list,
     to_object_list,
-    UNKNOWN_VALUE,
 )
 
 QL_BOND_PRICE_TYPE = {
@@ -53,7 +52,9 @@ def qCallabilityType(callability_type: str) -> ql.Callability.Type:
     },
     group=EXCEL_GROUP_NAME,
 )
-def qlBondPrice(amount: float, price_type: qBondPriceType) -> ql.BondPrice:
+def qlBondPrice(
+    amount: float, price_type: qBondPriceType, trigger=None
+) -> ql.BondPrice:
     return ql.BondPrice(amount, price_type)
 
 
@@ -72,20 +73,22 @@ def qlCallability(
     return ql.Callability(price, callability_type, date)
 
 
-# TODO add argument real trigger
 @xlo.func(
-    help="Create a QuantLib SoftCallability object from a bond price, callability type, and date.",
+    help="Create a QuantLib SoftCallability object from a bond price, date, and trigger value.",
     args={
         "price": "The bond price.",
-        "callability_type": 'The callability type (e.g., "CALL" or "PUT").',
         "date": "The date of the callability.",
+        "trigger_callability": "The trigger value for soft callability (e.g., yield threshold).",
     },
     group=EXCEL_GROUP_NAME,
 )
 def qlSoftCallability(
-    price: ql.BondPrice, callability_type: qCallabilityType, date: qDate, trigger=None
+    price: ql.BondPrice,
+    date: qDate,
+    trigger_callability: float,
+    trigger=None,
 ) -> ql.SoftCallability:
-    return ql.SoftCallability(price, callability_type, date)
+    return ql.SoftCallability(price, date, trigger_callability)
 
 
 @xlo.func(
@@ -336,7 +339,7 @@ def qlBondIssueDate(bond: ql.Bond, trigger=None) -> ql.Date:
     },
     group=EXCEL_GROUP_NAME,
 )
-def qlBondCashFlows(bond: ql.Bond, trigger=None) -> list[ql.CashFlow]:
+def qlBondCashFlows(bond: ql.Bond, trigger=None):
     return bond.cashflows()
 
 
@@ -358,7 +361,7 @@ def qlBondRedemption(bond: ql.Bond, trigger=None) -> ql.CashFlow:
     },
     group=EXCEL_GROUP_NAME,
 )
-def qlBondRedemptions(bond: ql.Bond, trigger=None) -> list[ql.CashFlow]:
+def qlBondRedemptions(bond: ql.Bond, trigger=None):
     return bond.redemptions()
 
 
@@ -381,7 +384,7 @@ def qlBondCalendar(bond: ql.Bond, trigger=None) -> ql.Calendar:
     },
     group=EXCEL_GROUP_NAME,
 )
-def qlBondNotionals(bond: ql.Bond, trigger=None) -> list[float]:
+def qlBondNotionals(bond: ql.Bond, trigger=None):
     return bond.notionals()
 
 
@@ -796,7 +799,7 @@ def qlAmortizingFixedRateBond(
     )
 
 
-# TODO test arguments caps and floors
+# TODO When the caps and floors are passed in, the error 'Pricer not set' appears, even though it has been set.
 @xlo.func(
     help="Create a QuantLib AmortizingFloatingRateBond object.",
     args={
@@ -879,7 +882,7 @@ def qlAmortizingFloatingRateBond(
     )
 
 
-# TODO test arguments caps and floors
+# TODO When the caps and floors are passed in, the error 'Pricer not set' appears, even though it has been set.
 @xlo.func(
     help="Create a QuantLib FloatingRateBond object.",
     args={
@@ -960,7 +963,7 @@ def qlFloatingRateBond(
     )
 
 
-# TODO test arguments gearings
+# TODO When the gearings<>0 are passed, the error 'Pricer not set' appears, even though it has been set.
 @xlo.func(
     help="Create a QuantLib CmsRateBond object.",
     args={
@@ -1016,7 +1019,7 @@ def qlCmsRateBond(
     )
 
 
-# TODO test argument gearings
+# TODO When the gearings<>0 are passed, the error 'Pricer not set' appears, even though it has been set.
 @xlo.func(
     help="Create a QuantLib AmortizingCmsRateBond object.",
     args={
@@ -1044,7 +1047,7 @@ def qlAmortizingCmsRateBond(
     payment_day_counter: qDayCounter,
     payment_convention: qBusinessDayConvention = ql.Following,
     fixing_days: int = 0,
-    gearings: xlo.Array(dims=1) = [0.0],  # gearings = {1.0}
+    gearings: xlo.Array(dims=1) = [0.0],
     spreads: xlo.Array(dims=1) = [0.0],
     caps: xlo.Array(dims=1) = None,
     floors: xlo.Array(dims=1) = None,
@@ -1087,9 +1090,7 @@ def qlDiscountingBondEngine(
     args={"callable_bond": "The QuantLib CallableBond instance."},
     group=EXCEL_GROUP_NAME,
 )
-def qlCallableBondCallability(
-    callable_bond: ql.CallableBond, Trigger=None
-) -> list[ql.Callability]:
+def qlCallableBondCallability(callable_bond: ql.CallableBond, Trigger=None):
     return callable_bond.callability()
 
 
@@ -1125,7 +1126,6 @@ def qlCallableBondImpliedVolatility(
     )
 
 
-# TODO test in excel
 @xlo.func(
     help="Calculate the Option-Adjusted Spread (OAS) of a bond.",
     args={
