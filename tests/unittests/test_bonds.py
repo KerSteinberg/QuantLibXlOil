@@ -32,6 +32,8 @@ from quantlib_xloil.bonds import (
     qlBondPriceType,
     qlBondSettlementDate,
     qlBondSettlementDays,
+    qlBondSinkingSchedule,
+    qlBondSinkingNotionals,
     qlCPIBond,
     qlDiscountingBondEngine,
     qlBondSettlementValue,
@@ -781,6 +783,64 @@ def test_cpi_bond():
         assert clean_price > 0.0
         assert clean_price < 200.0
         assert clean_price == pytest.approx(cpi_bond.cleanPrice())
+
+    finally:
+        ql.Settings.instance().evaluationDate = original_eval
+
+
+def test_bond_sinking_schedule():
+    original_eval = ql.Settings.instance().evaluationDate
+    try:
+        eval_date = qlDate(2025, 1, 2)
+        ql.Settings.instance().evaluationDate = eval_date
+
+        sinking_start_date = qlDate(2025, 1, 2)
+        bond_length = qPeriod.__wrapped__("5Y")
+        frequency = qFrequency.__wrapped__("ANNUAL")
+        payment_calendar = qlCalendar("TARGET")
+
+        sinking_schedule = qlBondSinkingSchedule(
+            start_date=sinking_start_date,
+            bond_length=bond_length,
+            frequency=frequency,
+            payment_calendar=payment_calendar,
+        )
+
+        assert isinstance(sinking_schedule, ql.Schedule)
+        assert len(sinking_schedule) > 0
+
+        assert sinking_schedule.startDate() == sinking_start_date
+
+    finally:
+        ql.Settings.instance().evaluationDate = original_eval
+
+
+def test_bond_sinking_notionals():
+    original_eval = ql.Settings.instance().evaluationDate
+    try:
+        eval_date = qlDate(2025, 1, 2)
+        ql.Settings.instance().evaluationDate = eval_date
+
+        bond_length = qPeriod.__wrapped__("5Y")
+        frequency = qFrequency.__wrapped__("ANNUAL")
+        coupon_rate = 0.05
+        initial_notional = 1000000.0
+
+        sinking_notionals = qlBondSinkingNotionals(
+            bond_length=bond_length,
+            frequency=frequency,
+            coupon_rate=coupon_rate,
+            initial_notional=initial_notional,
+        )
+
+        assert isinstance(sinking_notionals, tuple)
+        assert all(isinstance(notional, float) for notional in sinking_notionals)
+        assert len(sinking_notionals) > 0
+        for notional in sinking_notionals:
+            assert notional >= 0
+
+        total_notionals = sum(sinking_notionals)
+        assert total_notionals > 0
 
     finally:
         ql.Settings.instance().evaluationDate = original_eval
