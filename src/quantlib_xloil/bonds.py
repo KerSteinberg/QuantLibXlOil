@@ -594,50 +594,46 @@ def qlBondCleanPriceFromZSpread(
     )
 
 
-# TODO perform tests
 @xlo.func(
-    help="Get the sinking schedule of a bond.",
+    help="Calculate the sinking schedule for a bond with periodic amortization.",
     args={
-        "bond": "The bond object.",
-        "start_date": "The start date of the sinking schedule.",
-        "bond_length": 'The length of the bond (as a period, e.g., "10Y" for 10 years).',
-        "frequency": "The frequency of sinking payments.",
-        "payment_calendar": "The calendar for payment dates.",
+        "start_date": "The start date of the bond.",
+        "bond_length": "The total length of the bond (e.g., '10Y' for 10 years).",
+        "frequency": "The amortization frequency (e.g., 'Annual', 'Semiannual').",
+        "payment_calendar": "The calendar for payment date adjustments (e.g., 'TARGET').",
+        "trigger": "Optional trigger parameter (default: None).",
     },
     group=EXCEL_GROUP_NAME,
 )
-def qlBondsinkingSchedule(
-    bond: ql.Bond,
+def qlBondSinkingSchedule(
     start_date: qDate,
     bond_length: qPeriod,
     frequency: qFrequency,
     payment_calendar: qCalendar,
     trigger=None,
 ) -> ql.Schedule:
-    return bond.sinkingSchedule(start_date, bond_length, frequency, payment_calendar)
+    return ql.sinkingSchedule(start_date, bond_length, frequency, payment_calendar)
 
 
-# TODO perform tests
 @xlo.func(
-    help="Get the sinking notionals of a bond.",
+    help="Calculate the notional amortization amounts for a sinking fund bond.",
     args={
-        "bond": "The bond object.",
-        "bond_length": 'The length of the bond (as a period, e.g., "10Y" for 10 years).',
-        "frequency": "The frequency of sinking payments.",
-        "coupon_rate": "The coupon rate (as a decimal, e.g., 0.05 for 5%).",
-        "initial_notional": "The initial notional amount of the bond.",
+        "bond_length": "The total length of the bond (e.g., '10Y' for 10 years).",
+        "frequency": "The amortization frequency (e.g., 'Annual', 'Semiannual').",
+        "coupon_rate": "The coupon rate in decimal form (e.g., 0.05 for 5%).",
+        "initial_notional": "The initial notional amount (principal).",
+        "trigger": "Optional trigger parameter (default: None).",
     },
     group=EXCEL_GROUP_NAME,
 )
 def qlBondSinkingNotionals(
-    bond: ql.Bond,
     bond_length: qPeriod,
     frequency: qFrequency,
     coupon_rate: float,
     initial_notional: float,
     trigger=None,
-) -> list[float]:
-    return bond.sinkingNotionals(bond_length, frequency, coupon_rate, initial_notional)
+) -> tuple:
+    return ql.sinkingNotionals(bond_length, frequency, coupon_rate, initial_notional)
 
 
 @xlo.func(
