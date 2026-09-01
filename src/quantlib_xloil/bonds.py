@@ -559,7 +559,6 @@ def qlBondSettlementValue2(bond: ql.Bond, clean_price: float, trigger=None) -> f
     return bond.settlementValue(clean_price)
 
 
-# TODO perform tests
 @xlo.func(
     help="Calculate the clean price of a bond given a Z-spread.",
     args={
@@ -576,15 +575,21 @@ def qlBondSettlementValue2(bond: ql.Bond, clean_price: float, trigger=None) -> f
 def qlBondCleanPriceFromZSpread(
     bond: ql.Bond,
     discount_curve: ql.YieldTermStructureHandle,
-    z_spread: float = 0.002,
-    dc: qDayCounter = ql.Actual365Fixed(),
-    compounding: qCompounding = ql.Compounded,
-    freq: qFrequency = ql.Annual,
+    z_spread: float,
+    dc: qDayCounter,
+    compounding: qCompounding,
+    freq: qFrequency,
     settlement_date: qDate = ql.Date(),
     trigger=None,
 ) -> float:
-    return ql.BondFunctions.cleanPrice(
-        bond, discount_curve, z_spread, dc, compounding, freq, settlement_date
+    return ql.cleanPriceFromZSpread(
+        bond,
+        discount_curve.currentLink(),
+        z_spread,
+        dc,
+        compounding,
+        freq,
+        settlement_date,
     )
 
 
@@ -1091,7 +1096,6 @@ def qlCallableBondCallability(
     return callable_bond.callability()
 
 
-# TODO test in excel
 @xlo.func(
     help="Calculate the implied volatility of a bond.",
     args={
@@ -1364,7 +1368,7 @@ def qlCallableZeroCouponBond(
     )
 
 
-# TODO The implementation of qlTreeCallableFixedRateBondEngine I + II requires the implemtation of shortratemodels.py
+# TODO The implementation of qlTreeCallableFixedRateBondEngine I + II requires the implementation of shortratemodels.py
 
 
 @xlo.func(
