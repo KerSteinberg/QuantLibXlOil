@@ -4,6 +4,7 @@ import pytest
 from quantlib_xloil.bonds import (
     qlAmortizingFixedRateBond,
     qlAmortizingFloatingRateBond,
+    qlBondCleanPriceFromZSpread,
     qlBlackCallableFixedRateBondEngine,
     qBondPriceType,
     qCallabilityType,
@@ -391,5 +392,154 @@ def test_callable_bond_analytics_wrappers_match_methods():
                 2.0,
             )
         )
+    finally:
+        ql.Settings.instance().evaluationDate = original_eval
+
+
+def test_bond_clean_price_from_z_spread():
+    original_eval = ql.Settings.instance().evaluationDate
+    try:
+        eval_date = qlDate(2025, 1, 2)
+        ql.Settings.instance().evaluationDate = eval_date
+
+        day_counter = qlDayCounter("ACTUAL365FIXED")
+        calendar = qlCalendar("TARGET")
+
+        start = qlDate(2025, 1, 2)
+        end = qlDate(2030, 1, 2)
+        schedule = _fixed_schedule(start, end)
+
+        bond = qlFixedRateBond(
+            2,
+            100.0,
+            schedule,
+            [0.05],
+            day_counter,
+            ql.Following,
+            100.0,
+            start,
+        )
+        discount_curve = ql.YieldTermStructureHandle(
+            ql.FlatForward(eval_date, 0.04, day_counter)
+        )
+
+        clean_price_default = qlBondCleanPriceFromZSpread(
+            bond,
+            discount_curve,
+            z_spread=0.005,
+            dc=day_counter,
+            compounding=ql.Compounded,
+            freq=ql.Annual,
+            settlement_date=eval_date,
+        )
+        assert isinstance(clean_price_default, float)
+        assert clean_price_default > 0.0
+        assert clean_price_default < 200.0
+
+        clean_price_explicit = qlBondCleanPriceFromZSpread(
+            bond,
+            discount_curve,
+            z_spread=0.005,
+            dc=day_counter,
+            compounding=ql.Compounded,
+            freq=ql.Annual,
+            settlement_date=eval_date,
+        )
+        assert isinstance(clean_price_explicit, float)
+        assert clean_price_explicit > 0.0
+        assert clean_price_explicit < 200.0
+        clean_price_zero_spread = qlBondCleanPriceFromZSpread(
+            bond,
+            discount_curve,
+            z_spread=0.0,
+            dc=day_counter,
+            compounding=ql.Compounded,
+            freq=ql.Annual,
+            settlement_date=eval_date,
+        )
+        assert isinstance(clean_price_zero_spread, float)
+        assert clean_price_zero_spread > 0.0
+
+    finally:
+        ql.Settings.instance().evaluationDate = original_eval
+
+
+def test_callable_bond_implied_volatility_wrapper():
+    original_eval = ql.Settings.instance().evaluationDate
+    try:
+        eval_date = qlDate(2025, 1, 2)
+        ql.Settings.instance().evaluationDate = eval_date
+
+        start = qlDate(2025, 1, 2)
+        end = qlDate(2032, 1, 2)
+        schedule = _fixed_schedule(start, end)
+        day_counter = qlDayCounter("ACTUAL365FIXED")
+        callability = qlCallability(
+            ql.BondPrice(105.0, ql.BondPrice.Clean),
+            qCallabilityType.__wrapped__("CALL"),
+            qlDate(2028, 1, 2),
+        )
+        callable_bond = qlCallableFixedRateBond(
+            2,
+            100.0,
+            schedule,
+            [0.06],
+            day_counter,
+            ql.Following,
+            100.0,
+            start,
+            [callability],
+        )
+
+        assert isinstance(callable_bond, ql.CallableFixedRateBond)
+
+        curve_handle = ql.YieldTermStructureHandle(
+            ql.FlatForward(eval_date, 0.03, day_counter)
+        )
+        test_vol = 0.20
+        vol = qQuoteHandle.__wrapped__(test_vol)
+        engine = qlBlackCallableFixedRateBondEngine(vol, curve_handle)
+        callable_bond.setPricingEngine(engine)
+        actual_price = callable_bond.cleanPrice()
+
+        assert actual_price > 80.0, f"Bond price {actual_price} is too low"
+        assert actual_price < 120.0, f"Bond price {actual_price} is too high"
+
+        target_price = ql.BondPrice(actual_price, ql.BondPrice.Clean)
+        implied_vol = qlCallableBondImpliedVolatility(
+            callable_bond,
+            target_price,
+            curve_handle,
+            accuracy=1e-6,
+            max_evaluations=100,
+            min_vol=0.01,
+            max_vol=0.5,
+        )
+        assert isinstance(implied_vol, float)
+        assert implied_vol >= 0.0
+        assert implied_vol == pytest.approx(test_vol, rel=0.1)
+
+        higher_vol = 0.25
+        vol_higher = qQuoteHandle.__wrapped__(higher_vol)
+        engine_higher = ql.BlackCallableFixedRateBondEngine(vol_higher, curve_handle)
+        callable_bond.setPricingEngine(engine_higher)
+        higher_price_value = callable_bond.cleanPrice()
+        higher_price = ql.BondPrice(higher_price_value, ql.BondPrice.Clean)
+
+        callable_bond.setPricingEngine(engine)
+
+        implied_vol_higher = qlCallableBondImpliedVolatility(
+            callable_bond,
+            higher_price,
+            curve_handle,
+            accuracy=1e-6,
+            max_evaluations=100,
+            min_vol=0.01,
+            max_vol=0.5,
+        )
+        assert isinstance(implied_vol_higher, float)
+        assert implied_vol_higher >= 0.0
+        assert implied_vol_higher == pytest.approx(higher_vol, rel=0.1)
+
     finally:
         ql.Settings.instance().evaluationDate = original_eval
