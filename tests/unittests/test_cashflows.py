@@ -14,6 +14,7 @@ from quantlib_xloil.cashflows import (
     qlCappedFlooredCouponCap,
     qlCappedFlooredIborCoupon,
     qlCappedFlooredOvernightIndexedCoupon,
+    qlMultipleResetsCoupon,
     qlCashFlowAmount,
     qlCashFlowDate,
     qlCashFlowHasOccurred,
@@ -62,6 +63,9 @@ from quantlib_xloil.cashflows import (
     qlCouponRate,
     qlCouponReferencePeriodEnd,
     qlCouponReferencePeriodStart,
+    qlCmsLeg,
+    qlCmsSpreadLeg,
+    qlCmsZeroLeg,
     qlFixedRateCoupon,
     qlFixedRateLeg,
     qlFloatingRateCouponAdjustedFixing,
@@ -77,6 +81,7 @@ from quantlib_xloil.cashflows import (
     qlFloatingRateCouponSpread,
     qlIborCoupon,
     qlIborLeg,
+    qlMultipleResetsLeg,
     qlOvernightIndexedCoupon,
     qlOvernightIndexedCouponApplyObservationShift,
     qlOvernightIndexedCouponAveragingMethod,
@@ -92,13 +97,21 @@ from quantlib_xloil.cashflows import (
     qlOvernightIndexedCouponRateComputationEndDate,
     qlOvernightIndexedCouponRateComputationStartDate,
     qlOvernightIndexedCouponValueDates,
+    qlOvernightLeg,
+    qlRangeAccrualLeg,
     qlSetCouponPricer,
     qlSimpleCashFlow,
 )
-from quantlib_xloil.calendars import qlCalendar
+from quantlib_xloil.calendars import (
+    qBusinessDayConvention,
+    qCalendar,
+    qPeriod,
+    qlCalendar,
+)
+from quantlib_xloil.currencies import qCurrency
 from quantlib_xloil.date import qFrequency, qlDate
 from quantlib_xloil.daycounters import qlDayCounter
-from quantlib_xloil.indexes import qlEuribor, qlSofr
+from quantlib_xloil.indexes import qlEuribor, qlSofr, qlSwapIndex, qlSwapSpreadIndex
 from quantlib_xloil.termstructures import qCompounding, qlFlatForward
 
 
@@ -204,6 +217,23 @@ def test_floatingratecoupon_methods_on_ibor_coupon():
         day_counter,
         False,
         ql.Date(),
+    )
+
+    coupon_2 = qlIborCoupon(
+        payment_date,
+        100.0,
+        start_date,
+        end_date,
+        fixing_days,
+        index,
+        1.0,
+        0.001,
+        start_date,
+        end_date,
+        day_counter,
+        False,
+        ql.Date(),
+        ql.Following,
     )
 
     assert qlFloatingRateCouponFixingDate(coupon) < start_date
@@ -322,6 +352,50 @@ def test_overnightindexedcoupon_methods_on_sofr_coupon():
         assert len(index_fixings) == len(fixing_dates)
         assert qlOvernightIndexedCouponEffectiveIndexFixing(coupon) > 0.0
         assert qlOvernightIndexedCouponEffectiveSpread(coupon) == 0.0
+    finally:
+        ql.Settings.instance().evaluationDate = original_eval
+
+
+def test_multiple_resets_coupon():
+    original_eval = ql.Settings.instance().evaluationDate
+
+    start_date = qlDate(2024, 1, 2)
+    end_date = qlDate(2024, 7, 2)
+    payment_date = end_date
+    curve = _curve(start_date, 0.03)
+    index = qlEuribor(ql.Period("6M"), curve)
+
+    # Create a reset schedule with multiple reset dates
+    reset_schedule = ql.Schedule(
+        start_date,
+        end_date,
+        ql.Period(ql.Monthly),
+        qlCalendar("TARGET"),
+        ql.Unadjusted,
+        ql.Unadjusted,
+        ql.DateGeneration.Forward,
+        False,
+    )
+
+    ql.Settings.instance().evaluationDate = start_date
+
+    try:
+        coupon = qlMultipleResetsCoupon(
+            payment_date,
+            100.0,
+            reset_schedule,
+            fixing_days=2,
+            index=index,
+            gearing=1.0,
+            coupon_spread=0.001,
+            rate_spread=0.0,
+        )
+
+        assert coupon is not None
+        assert qlCouponNominal(coupon) == 100.0
+        assert qlCouponAccrualStartDate(coupon) == start_date
+        assert qlCouponAccrualEndDate(coupon) == end_date
+        assert qlFloatingRateCouponIndex(coupon) is not None
     finally:
         ql.Settings.instance().evaluationDate = original_eval
 
@@ -567,3 +641,429 @@ def test_additional_pricer_constructors():
     assert isinstance(
         qlAveragingMultipleResetsPricer(), ql.AveragingMultipleResetsPricer
     )
+
+
+def test_qlFixedRateLeg_constructor():
+    start = qlDate(2024, 1, 2)
+    end = qlDate(2027, 1, 2)
+    schedule = _schedule(start, end)
+    day_counter = qlDayCounter("ACTUAL365FIXED")
+
+    nominals = [100.0, 100.0, 100.0]
+    coupon_rates = [0.05, 0.05, 0.05]
+
+    leg = qlFixedRateLeg(
+        schedule,
+        day_counter,
+        nominals,
+        coupon_rates,
+    )
+
+    assert len(leg) == 3
+    assert qlCashFlowsStartDate(leg) == start
+    assert qlCashFlowsMaturityDate(leg) == end
+
+    leg = qlFixedRateLeg(
+        schedule,
+        day_counter,
+        nominals,
+        None,
+        payment_adjustment=qBusinessDayConvention.__wrapped__("FOLLOWING"),
+        first_period_day_count=qlDayCounter("ACTUAL360"),
+        ex_coupon_period=ql.Period("1D"),
+        ex_coupon_calendar=qlCalendar("TARGET"),
+        ex_coupon_convention=qBusinessDayConvention.__wrapped__("UNADJUSTED"),
+        ex_coupon_end_of_month=True,
+        payment_calendar=qlCalendar("TARGET"),
+        payment_lag=2,
+        compounding=qCompounding.__wrapped__("COMPOUNDED"),
+        compounding_frequency=qFrequency.__wrapped__("SEMIANNUAL"),
+        interest_rates=[
+            ql.InterestRate(
+                0.01,
+                qlDayCounter("ACTUAL365FIXED"),
+                qCompounding.__wrapped__("COMPOUNDED"),
+                qFrequency.__wrapped__("SEMIANNUAL"),
+            ),
+            ql.InterestRate(
+                0.01,
+                qlDayCounter("ACTUAL365FIXED"),
+                qCompounding.__wrapped__("COMPOUNDED"),
+                qFrequency.__wrapped__("SEMIANNUAL"),
+            ),
+            ql.InterestRate(
+                0.01,
+                qlDayCounter("ACTUAL365FIXED"),
+                qCompounding.__wrapped__("COMPOUNDED"),
+                qFrequency.__wrapped__("SEMIANNUAL"),
+            ),
+        ],
+    )
+
+    assert len(leg) == 3
+    assert qlCashFlowsStartDate(leg) == start
+    assert qlCashFlowsMaturityDate(leg) == end
+
+    leg = qlFixedRateLeg(
+        schedule,
+        day_counter,
+        nominals,
+        coupon_rates,
+        payment_adjustment=qBusinessDayConvention.__wrapped__("FOLLOWING"),
+        first_period_day_count=qlDayCounter("ACTUAL360"),
+        ex_coupon_period=ql.Period("1D"),
+        ex_coupon_calendar=qlCalendar("TARGET"),
+        ex_coupon_convention=qBusinessDayConvention.__wrapped__("UNADJUSTED"),
+        ex_coupon_end_of_month=True,
+        payment_calendar=qlCalendar("TARGET"),
+        payment_lag=2,
+        compounding=qCompounding.__wrapped__("COMPOUNDED"),
+        compounding_frequency=qFrequency.__wrapped__("SEMIANNUAL"),
+    )
+
+    assert len(leg) == 3
+    assert qlCashFlowsStartDate(leg) == start
+    assert qlCashFlowsMaturityDate(leg) == end
+
+
+def test_qlIborLeg_constructor():
+    start = qlDate(2024, 1, 2)
+    end = qlDate(2026, 1, 2)
+    schedule = _schedule(start, end)
+    curve = _curve(start, 0.03)
+    index = qlEuribor(ql.Period("6M"), curve)
+
+    nominals = [100.0, 100.0]
+
+    leg = qlIborLeg(
+        nominals,
+        schedule,
+        index,
+        payment_day_counter=qlDayCounter("ACTUAL365FIXED"),
+    )
+
+    assert len(leg) == 2
+    assert qlCashFlowsStartDate(leg) == start
+    assert qlCashFlowsMaturityDate(leg) == end
+
+    leg = qlIborLeg(
+        nominals,
+        schedule,
+        index,
+        payment_day_counter=qlDayCounter("ACTUAL365FIXED"),
+        payment_convention=qBusinessDayConvention.__wrapped__("FOLLOWING"),
+        fixing_days=(2,),
+        gearings=[1.0, 1.0],
+        spreads=[0.001, 0.001],
+        caps=[0.06, 0.06],
+        floors=[0.01, 0.01],
+        is_in_arrears=False,
+        ex_coupon_period=ql.Period("1D"),
+        ex_coupon_calendar=qlCalendar("TARGET"),
+        ex_coupon_convention=qBusinessDayConvention.__wrapped__("UNADJUSTED"),
+        ex_coupon_end_of_month=True,
+        payment_calendar=qlCalendar("TARGET"),
+        payment_lag=2,
+        with_indexed_coupons=False,
+    )
+
+    assert len(leg) == 2
+    assert qlCashFlowsStartDate(leg) == start
+    assert qlCashFlowsMaturityDate(leg) == end
+
+
+def test_qlOvernightLeg_constructor():
+    start = qlDate(2024, 1, 2)
+    end = qlDate(2026, 1, 2)
+    schedule = _schedule(start, end)
+    curve = _curve(start, 0.03)
+    index = qlSofr(curve)
+
+    nominals = [100.0, 100.0]
+
+    leg = qlOvernightLeg(
+        nominals,
+        schedule,
+        index,
+        payment_day_counter=qlDayCounter("ACTUAL365FIXED"),
+    )
+
+    assert len(leg) == 2
+    assert qlCashFlowsStartDate(leg) == start
+    assert qlCashFlowsMaturityDate(leg) == end
+
+    leg = qlOvernightLeg(
+        nominals,
+        schedule,
+        index,
+        payment_day_counter=qlDayCounter("ACTUAL365FIXED"),
+        payment_convention=qBusinessDayConvention.__wrapped__("FOLLOWING"),
+        gearings=[1.0, 1.0],
+        spreads=[0.001, 0.001],
+        telescopic_value_dates=False,
+        averaging_method=qRateAveragingType.__wrapped__("COMPOUND"),
+        payment_calendar=qlCalendar("TARGET"),
+        payment_lag=2,
+        lookback_days=ql.nullInt(),
+        lockout_days=1,
+        apply_observation_shift=False,
+        compound_spread_daily=False,
+        caps=[0.06, 0.06],
+        floors=[0.01, 0.01],
+        daily_cap_floor=False,
+        in_arrears=True,
+        naked_option=False,
+        payment_dates=[ql.Date(2, 1, 2025), ql.Date(2, 1, 2026)],
+    )
+
+    assert len(leg) == 2
+    assert qlCashFlowsStartDate(leg) == start
+    assert qlCashFlowsMaturityDate(leg) == end
+
+
+def test_qlCmsLeg_constructor():
+    start = qlDate(2024, 1, 2)
+    end = qlDate(2026, 1, 2)
+    schedule = _schedule(start, end)
+    curve = _curve(start, 0.03)
+    index = qlEuribor(ql.Period("6M"), curve)
+    swap_index = qlSwapIndex(
+        family_name="TestSwapIndex",
+        tenor=ql.Period("10Y"),
+        settlement_days=2,
+        currency=qCurrency.__wrapped__("EUR"),
+        calendar=qlCalendar("TARGET"),
+        fixed_leg_tenor=ql.Period("1Y"),
+        fixed_leg_convention=qBusinessDayConvention.__wrapped__("MODIFIEDFOLLOWING"),
+        fixed_leg_day_counter=qlDayCounter("ACTUAL365FIXED"),
+        ibor_index=index,
+        discount_curve=curve,
+    )
+
+    nominals = [100.0, 100.0]
+
+    leg = qlCmsLeg(
+        nominals,
+        schedule,
+        swap_index,
+        payment_day_counter=qlDayCounter("ACTUAL365FIXED"),
+    )
+
+    assert len(leg) == 2
+    assert qlCashFlowsStartDate(leg) == start
+    assert qlCashFlowsMaturityDate(leg) == end
+
+    leg = qlCmsLeg(
+        nominals,
+        schedule,
+        swap_index,
+        payment_day_counter=qlDayCounter("ACTUAL365FIXED"),
+        payment_convention=qBusinessDayConvention.__wrapped__("FOLLOWING"),
+        fixing_days=(2,),
+        gearings=[1.0, 1.0],
+        spreads=[0.001, 0.001],
+        caps=[0.06, 0.06],
+        floors=[0.01, 0.01],
+        is_in_arrears=False,
+        ex_coupon_period=ql.Period("1D"),
+        ex_coupon_calendar=qlCalendar("TARGET"),
+        ex_coupon_convention=qBusinessDayConvention.__wrapped__("UNADJUSTED"),
+        ex_coupon_end_of_month=True,
+        fixing_convention=qBusinessDayConvention.__wrapped__("PRECEDING"),
+    )
+
+    assert len(leg) == 2
+    assert qlCashFlowsStartDate(leg) == start
+    assert qlCashFlowsMaturityDate(leg) == end
+
+
+def test_qlCmsZeroLeg_constructor():
+    start = qlDate(2024, 1, 2)
+    end = qlDate(2026, 1, 2)
+    schedule = _schedule(start, end)
+    curve = _curve(start, 0.03)
+    index = qlEuribor(ql.Period("6M"), curve)
+    swap_index = qlSwapIndex(
+        family_name="TestSwapIndex",
+        tenor=ql.Period("10Y"),
+        settlement_days=2,
+        currency=qCurrency.__wrapped__("EUR"),
+        calendar=qlCalendar("TARGET"),
+        fixed_leg_tenor=ql.Period("1Y"),
+        fixed_leg_convention=qBusinessDayConvention.__wrapped__("MODIFIEDFOLLOWING"),
+        fixed_leg_day_counter=qlDayCounter("ACTUAL365FIXED"),
+        ibor_index=index,
+        discount_curve=curve,
+    )
+
+    nominals = [100.0, 100.0]
+
+    leg = qlCmsZeroLeg(
+        nominals,
+        schedule,
+        swap_index,
+        payment_day_counter=qlDayCounter("ACTUAL365FIXED"),
+    )
+
+    assert len(leg) == 2
+    assert qlCashFlowsStartDate(leg) == start
+    assert qlCashFlowsMaturityDate(leg) == end
+
+    leg = qlCmsZeroLeg(
+        nominals,
+        schedule,
+        swap_index,
+        payment_day_counter=qlDayCounter("ACTUAL365FIXED"),
+        payment_convention=qBusinessDayConvention.__wrapped__("FOLLOWING"),
+        fixing_days=(2,),
+        gearings=[1.0, 1.0],
+        spreads=[0.001, 0.001],
+        caps=[0.06, 0.06],
+        floors=[0.01, 0.01],
+        ex_coupon_period=ql.Period("1D"),
+        ex_coupon_calendar=qlCalendar("TARGET"),
+        ex_coupon_convention=qBusinessDayConvention.__wrapped__("UNADJUSTED"),
+        ex_coupon_end_of_month=True,
+    )
+
+    assert len(leg) == 2
+    assert qlCashFlowsStartDate(leg) == start
+    assert qlCashFlowsMaturityDate(leg) == end
+
+
+def test_qlCmsSpreadLeg_constructor():
+    start = qlDate(2024, 1, 2)
+    end = qlDate(2026, 1, 2)
+    schedule = _schedule(start, end)
+    curve = _curve(start, 0.03)
+    index1 = qlEuribor(ql.Period("6M"), curve)
+    index2 = qlEuribor(ql.Period("12M"), curve)
+    swap_index1 = qlSwapIndex(
+        family_name="TestSwapIndex1",
+        tenor=ql.Period("10Y"),
+        settlement_days=2,
+        currency=qCurrency.__wrapped__("EUR"),
+        calendar=qlCalendar("TARGET"),
+        fixed_leg_tenor=ql.Period("1Y"),
+        fixed_leg_convention=qBusinessDayConvention.__wrapped__("MODIFIEDFOLLOWING"),
+        fixed_leg_day_counter=qlDayCounter("ACTUAL365FIXED"),
+        ibor_index=index1,
+        discount_curve=curve,
+    )
+    swap_index2 = qlSwapIndex(
+        family_name="TestSwapIndex2",
+        tenor=ql.Period("10Y"),
+        settlement_days=2,
+        currency=qCurrency.__wrapped__("EUR"),
+        calendar=qlCalendar("TARGET"),
+        fixed_leg_tenor=ql.Period("1Y"),
+        fixed_leg_convention=qBusinessDayConvention.__wrapped__("MODIFIEDFOLLOWING"),
+        fixed_leg_day_counter=qlDayCounter("ACTUAL365FIXED"),
+        ibor_index=index2,
+        discount_curve=curve,
+    )
+    spread_index = qlSwapSpreadIndex("TestSpreadIndex", swap_index1, swap_index2)
+
+    nominals = [100.0, 100.0]
+
+    leg = qlCmsSpreadLeg(
+        nominals,
+        schedule,
+        spread_index,
+        payment_day_counter=qlDayCounter("ACTUAL365FIXED"),
+    )
+
+    assert len(leg) == 2
+    assert qlCashFlowsStartDate(leg) == start
+    assert qlCashFlowsMaturityDate(leg) == end
+
+    leg = qlCmsSpreadLeg(
+        nominals,
+        schedule,
+        spread_index,
+        payment_day_counter=qlDayCounter("ACTUAL365FIXED"),
+        payment_convention=qBusinessDayConvention.__wrapped__("FOLLOWING"),
+        fixing_days=(2,),
+        gearings=[1.0, 1.0],
+        spreads=[0.001, 0.001],
+        caps=[0.06, 0.06],
+        floors=[0.01, 0.01],
+        is_in_arrears=False,
+    )
+
+    assert len(leg) == 2
+    assert qlCashFlowsStartDate(leg) == start
+    assert qlCashFlowsMaturityDate(leg) == end
+
+
+def test_qlMultipleResetsLeg_constructor():
+    start = qlDate(2024, 1, 2)
+    end = qlDate(2026, 1, 2)
+    full_reset_schedule = _schedule(start, end)
+    curve = _curve(start, 0.03)
+    index = qlEuribor(ql.Period("6M"), curve)
+
+    nominals = [100.0]
+    resets_per_coupon = 2
+
+    leg = qlMultipleResetsLeg(
+        full_reset_schedule,
+        index,
+        resets_per_coupon,
+        nominals,
+    )
+
+    assert len(leg) > 0
+    assert qlCashFlowsStartDate(leg) == start
+    assert qlCashFlowsMaturityDate(leg) == end
+
+    leg = qlMultipleResetsLeg(
+        full_reset_schedule,
+        index,
+        resets_per_coupon,
+        nominals,
+        payment_day_counter=qlDayCounter("ACTUAL365FIXED"),
+        payment_convention=qBusinessDayConvention.__wrapped__("FOLLOWING"),
+        payment_calendar=qlCalendar("TARGET"),
+        payment_lag=2,
+        fixing_days=(2,),
+        gearings=[1.0],
+        coupon_spreads=[0.001],
+        rate_spreads=[0.0005],
+        ex_coupon_period=ql.Period("1D"),
+        ex_coupon_calendar=qlCalendar("TARGET"),
+        ex_coupon_convention=qBusinessDayConvention.__wrapped__("UNADJUSTED"),
+        ex_coupon_end_of_month=True,
+        averaging_method=qRateAveragingType.__wrapped__("COMPOUND"),
+    )
+
+    assert len(leg) > 0
+    assert qlCashFlowsStartDate(leg) == start
+    assert qlCashFlowsMaturityDate(leg) == end
+
+
+def test_qlRangeAccrualLeg_constructor():
+    start = qlDate(2024, 1, 2)
+    end = qlDate(2026, 1, 2)
+    schedule = _schedule(start, end)
+    curve = _curve(start, 0.03)
+    index = qlEuribor(ql.Period("6M"), curve)
+
+    nominals = [100.0, 100.0]
+
+    leg = qlRangeAccrualLeg(
+        nominals,
+        schedule,
+        index,
+        payment_day_counter=qlDayCounter("ACTUAL365FIXED"),
+        payment_convention=qBusinessDayConvention.__wrapped__("FOLLOWING"),
+        fixing_days=(2,),
+        gearings=[1.0, 1.0],
+        spreads=[0.001, 0.001],
+        lower_triggers=[0.01, 0.01],
+        upper_triggers=[0.06, 0.06],
+        observation_tenor=ql.Period("1D"),
+        observation_convention=qBusinessDayConvention.__wrapped__("MODIFIEDFOLLOWING"),
+    )
+
+    assert len(leg) > 0

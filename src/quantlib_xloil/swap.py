@@ -1063,7 +1063,7 @@ def qlDiscountingSwapEngine2(
         "index": "The index for the floating leg.",
         "spread": "The spread for the floating leg.",
         "float_schedule": "The schedule for floating leg payments (default: empty schedule).",
-        "floating_day_count": "The day counter for the floating leg (default: act/360).",
+        "floating_day_count": "The day counter for the floating leg (default: DayCounter()).",
         "par_asset_swap": "Whether the asset swap is par (default: True).",
         "gearing": "The gearing for the floating leg (default: 1.0).",
         "non_par_repayment": "The non-par repayment amount (default: 0).",
@@ -1078,25 +1078,38 @@ def qlAssetSwap(
     index: ql.IborIndex,
     spread: float,
     float_schedule: ql.Schedule = ql.Schedule(),
-    floating_day_count: qDayCounter = ql.Actual360(),  # TODO default value
+    floating_day_count: qDayCounter = None,
     par_asset_swap: bool = True,
     gearing: float = 1.0,
-    non_par_repayment: float = 0,  # TODO default value
+    non_par_repayment: float = 0,
     deal_maturity: qDate = ql.Date(),
     trigger=None,
 ) -> ql.AssetSwap:
+    if floating_day_count is not None:
+        floating_day_count = qDayCounter.__wrapped__(floating_day_count)
+
+    _ASSET_SWAP_KWARGS = {
+        "float_schedule": "floatSchedule",
+        "floating_day_count": "floatingDayCount",
+        "par_asset_swap": "parAssetSwap",
+        "gearing": "gearing",
+        "non_par_repayment": "nonParRepayment",
+        "deal_maturity": "dealMaturity",
+    }
+
+    kwargs = {}
+    for param_name, kw_name in _ASSET_SWAP_KWARGS.items():
+        value = locals()[param_name]
+        if value is not None:
+            kwargs[kw_name] = value
+
     return ql.AssetSwap(
         pay_fixed_rate,
         bond,
         bond_clean_price,
         index,
         spread,
-        float_schedule,
-        floating_day_count,
-        par_asset_swap,
-        gearing,
-        non_par_repayment,
-        deal_maturity,
+        **kwargs,
     )
 
 
@@ -1233,7 +1246,7 @@ def qlFloatFloatSwapFairSpread2(swap: ql.FloatFloatSwap, trigger=None) -> float:
         "spread": "The spread for the floating leg (default: 0.0).",
         "payment_lag": "The payment lag (default: 0).",
         "payment_adjustment": "The business day convention for payments (default: Following).",
-        "payment_calendar": "The calendar for payments (default: null calendar).",
+        "payment_calendar": "The calendar for payments (default: Calendar()).",
         "telescopic_value_dates": "Whether to use telescopic value dates (default: False).",
         "averaging_method": "The averaging method for the floating leg (default: Compound).",
         "lookback_days": "The number of lookback days (default: 0).",
@@ -1252,15 +1265,20 @@ def qlOvernightIndexedSwap(
     spread: float = 0.0,
     payment_lag: int = 0,
     payment_adjustment: qBusinessDayConvention = ql.Following,
-    payment_calendar: qCalendar = ql.NullCalendar(),  # TODO default value
+    payment_calendar: qCalendar = None,
     telescopic_value_dates: bool = False,
     averaging_method: qRateAveragingType = ql.RateAveraging.Compound,
-    lookback_days: int = 0,  # TODO default value,
+    lookback_days: int = 0,
     lockout_days: int = 0,
     apply_observation_shift: bool = False,
     trigger=None,
 ) -> ql.OvernightIndexedSwap:
-    return ql.OvernightIndexedSwap(
+    if payment_calendar is not None:
+        payment_calendar = qCalendar.__wrapped__(payment_calendar)
+    else:
+        payment_calendar = ""
+
+    args = [
         type,
         nominal,
         schedule,
@@ -1276,7 +1294,9 @@ def qlOvernightIndexedSwap(
         lookback_days,
         lockout_days,
         apply_observation_shift,
-    )
+    ]
+
+    return ql.OvernightIndexedSwap(*args)
 
 
 @xlo.func(
@@ -1293,7 +1313,7 @@ def qlOvernightIndexedSwap(
         "spread": "The spread for the overnight leg (default: 0.0).",
         "payment_lag": "The payment lag (default: 0).",
         "payment_adjustment": "The business day convention for payments (default: Following).",
-        "payment_calendar": "The calendar for payments (default: null calendar).",
+        "payment_calendar": "The calendar for payments (default: Calendar()).",
         "telescopic_value_dates": "Whether to use telescopic value dates (default: False).",
         "averaging_method": "The averaging method for the overnight leg (default: Compound).",
         "lookback_days": "The number of lookback days (default: 0).",
@@ -1314,14 +1334,35 @@ def qlOvernightIndexedSwap2(
     spread: float = 0.0,
     payment_lag: int = 0,
     payment_adjustment: qBusinessDayConvention = ql.Following,
-    payment_calendar: qCalendar = ql.NullCalendar(),  # TODO default value
+    payment_calendar: qCalendar = None,
     telescopic_value_dates: bool = False,
     averaging_method: qRateAveragingType = ql.RateAveraging.Compound,
-    lookback_days: int = 0,  # TODO default value
+    lookback_days: int = 0,
     lockout_days: int = 0,
     apply_observation_shift: bool = False,
     trigger=None,
 ) -> ql.OvernightIndexedSwap:
+    if payment_calendar is not None:
+        payment_calendar = qCalendar.__wrapped__(payment_calendar)
+
+    _OIS2_KWARGS = {
+        "spread": "spread",
+        "payment_lag": "paymentLag",
+        "payment_adjustment": "paymentAdjustment",
+        "payment_calendar": "paymentCalendar",
+        "telescopic_value_dates": "telescopicValueDates",
+        "averaging_method": "averagingMethod",
+        "lookback_days": "lookbackDays",
+        "lockout_days": "lockoutDays",
+        "apply_observation_shift": "applyObservationShift",
+    }
+
+    kwargs = {}
+    for param_name, kw_name in _OIS2_KWARGS.items():
+        value = locals()[param_name]
+        if value is not None:
+            kwargs[kw_name] = value
+
     return ql.OvernightIndexedSwap(
         type,
         to_float_list(fixed_nominals),
@@ -1331,15 +1372,7 @@ def qlOvernightIndexedSwap2(
         to_float_list(overnight_nominals),
         overnight_schedule,
         overnight_index,
-        spread,
-        payment_lag,
-        payment_adjustment,
-        payment_calendar,
-        telescopic_value_dates,
-        averaging_method,
-        lookback_days,
-        lockout_days,
-        apply_observation_shift,
+        **kwargs,
     )
 
 
@@ -1978,7 +2011,7 @@ def qlZeroCouponSwapFairFixedRate(
         "day_counter": "The day counter.",
         "margin": "The margin.",
         "gearing": "The gearing (default: 1.0).",
-        "payment_calendar": "The payment calendar (default: null calendar).",
+        "payment_calendar": "The payment calendar (default: Calendar()).",
         "payment_convention": "The business day convention for payments (default: Unadjusted).",
         "payment_delay": "The payment delay (default: 0).",
     },
@@ -1993,11 +2026,27 @@ def qlEquityTotalReturnSwap(
     day_counter: qDayCounter,
     margin: float,
     gearing: float = 1.0,
-    payment_calendar: qCalendar = ql.NullCalendar(),  # TODO default value
+    payment_calendar: qCalendar = None,
     payment_convention: qBusinessDayConvention = ql.Unadjusted,
     payment_delay: int = 0,
     trigger=None,
 ) -> ql.EquityTotalReturnSwap:
+    if payment_calendar is not None:
+        payment_calendar = qCalendar.__wrapped__(payment_calendar)
+
+    _ETRS_KWARGS = {
+        "gearing": "gearing",
+        "payment_calendar": "paymentCalendar",
+        "payment_convention": "paymentConvention",
+        "payment_delay": "paymentDelay",
+    }
+
+    kwargs = {}
+    for param_name, kw_name in _ETRS_KWARGS.items():
+        value = locals()[param_name]
+        if value is not None:
+            kwargs[kw_name] = value
+
     return ql.EquityTotalReturnSwap(
         type,
         nominal,
@@ -2006,10 +2055,7 @@ def qlEquityTotalReturnSwap(
         interest_rate_index,
         day_counter,
         margin,
-        gearing,
-        payment_calendar,
-        payment_convention,
-        payment_delay,
+        **kwargs,
     )
 
 
@@ -2024,7 +2070,7 @@ def qlEquityTotalReturnSwap(
         "day_counter": "The day counter.",
         "margin": "The margin.",
         "gearing": "The gearing (default: 1.0).",
-        "payment_calendar": "The payment calendar (default: null calendar).",
+        "payment_calendar": "The payment calendar (default: Calendar()).",
         "payment_convention": "The business day convention for payments (default: Unadjusted).",
         "payment_delay": "The payment delay (default: 0).",
     },
@@ -2039,11 +2085,27 @@ def qlEquityTotalReturnSwap2(
     day_counter: qDayCounter,
     margin: float,
     gearing: float = 1.0,
-    payment_calendar: qCalendar = ql.NullCalendar(),  # TODO default value
+    payment_calendar: qCalendar = None,
     payment_convention: qBusinessDayConvention = ql.Unadjusted,
     payment_delay: int = 0,
     trigger=None,
 ) -> ql.EquityTotalReturnSwap:
+    if payment_calendar is not None:
+        payment_calendar = qCalendar.__wrapped__(payment_calendar)
+
+    _ETRS2_KWARGS = {
+        "gearing": "gearing",
+        "payment_calendar": "paymentCalendar",
+        "payment_convention": "paymentConvention",
+        "payment_delay": "paymentDelay",
+    }
+
+    kwargs = {}
+    for param_name, kw_name in _ETRS2_KWARGS.items():
+        value = locals()[param_name]
+        if value is not None:
+            kwargs[kw_name] = value
+
     return ql.EquityTotalReturnSwap(
         type,
         nominal,
@@ -2052,10 +2114,7 @@ def qlEquityTotalReturnSwap2(
         interest_rate_index,
         day_counter,
         margin,
-        gearing,
-        payment_calendar,
-        payment_convention,
-        payment_delay,
+        **kwargs,
     )
 
 

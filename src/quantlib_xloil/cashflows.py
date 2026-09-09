@@ -1,9 +1,14 @@
 import QuantLib as ql
 import xloil as xlo
 
-from .calendars import qBusinessDayConvention, QL_BUSINESSDAYCONVENTION
+from .calendars import (
+    qBusinessDayConvention,
+    qCalendar,
+    qPeriod,
+    QL_BUSINESSDAYCONVENTION,
+)
 from .config import EXCEL_GROUP_NAME
-from .date import qDate, qFrequency, _qDate
+from .date import _to_date_list, qDate, qFrequency, _qDate
 from .daycounters import qDayCounter
 from .termstructures import qCompounding
 from .utilities import (
@@ -934,11 +939,28 @@ def qlIborCoupon(
     spread: float = 0.0,
     ref_period_start: qDate = ql.Date(),
     ref_period_end: qDate = ql.Date(),
-    day_counter: qDayCounter = ql.Actual365Fixed(),
+    day_counter=None,
     is_in_arrears: bool = False,
     ex_coupon_date: qDate = ql.Date(),
+    fixing_convention: qBusinessDayConvention = ql.Preceding,
     trigger=None,
 ) -> ql.IborCoupon:
+    if day_counter is not None:
+        day_counter = qDayCounter.__wrapped__(day_counter)
+
+    _KWARGS = {
+        "day_counter": "dayCounter",
+        "is_in_arrears": "isInArrears",
+        "ex_coupon_date": "exCouponDate",
+        "fixing_convention": "fixingConvention",
+    }
+
+    kwargs = {}
+    for param_name, kw_name in _KWARGS.items():
+        value = locals()[param_name]
+        if value is not None:
+            kwargs[kw_name] = value
+
     cpn = ql.IborCoupon(
         payment_date,
         nominal,
@@ -950,9 +972,7 @@ def qlIborCoupon(
         spread,
         ref_period_start,
         ref_period_end,
-        day_counter,
-        is_in_arrears,
-        ex_coupon_date,
+        **kwargs,
     )
     cpn.setPricer(ql.BlackIborCouponPricer())
     return cpn
@@ -992,11 +1012,26 @@ def qlCappedFlooredIborCoupon(
     floor: float = ql.nullDouble(),
     ref_period_start: qDate = ql.Date(),
     ref_period_end: qDate = ql.Date(),
-    day_counter: qDayCounter = ql.Actual365Fixed(),
+    day_counter=None,
     is_in_arrears: bool = False,
     ex_coupon_date: qDate = ql.Date(),
     trigger=None,
 ) -> ql.CappedFlooredIborCoupon:
+    if day_counter is not None:
+        day_counter = qDayCounter.__wrapped__(day_counter)
+
+    _KWARGS = {
+        "day_counter": "dayCounter",
+        "is_in_arrears": "isInArrears",
+        "ex_coupon_date": "exCouponDate",
+    }
+
+    kwargs = {}
+    for param_name, kw_name in _KWARGS.items():
+        value = locals()[param_name]
+        if value is not None:
+            kwargs[kw_name] = value
+
     return ql.CappedFlooredIborCoupon(
         payment_date,
         nominal,
@@ -1010,9 +1045,7 @@ def qlCappedFlooredIborCoupon(
         floor,
         ref_period_start,
         ref_period_end,
-        day_counter,
-        is_in_arrears,
-        ex_coupon_date,
+        **kwargs,
     )
 
 
@@ -1053,6 +1086,8 @@ def qlCappedFlooredCoupon(
         "lockout_days": "Lockout days.",
         "apply_observation_shift": "Apply observation shift.",
         "compound_spread": "Compound spread daily.",
+        "rate_computation_start_date": "Rate computation start date.",
+        "rate_computation_end_date": "Rate computation end date.",
     },
     group=EXCEL_GROUP_NAME,
 )
@@ -1066,15 +1101,38 @@ def qlOvernightIndexedCoupon(
     spread: float = 0.0,
     ref_period_start: qDate = ql.Date(),
     ref_period_end: qDate = ql.Date(),
-    day_counter: qDayCounter = ql.Actual365Fixed(),
+    day_counter=None,
     telescopic_value_dates: bool = False,
     averaging_method: qRateAveragingType = ql.RateAveraging.Compound,
     lookback_days: int = ql.nullInt(),
     lockout_days: int = 0,
     apply_observation_shift: bool = False,
     compound_spread: bool = False,
+    rate_computation_start_date: qDate = ql.Date(),
+    rate_computation_end_date: qDate = ql.Date(),
     trigger=None,
 ) -> ql.OvernightIndexedCoupon:
+    if day_counter is not None:
+        day_counter = qDayCounter.__wrapped__(day_counter)
+
+    _KWARGS = {
+        "day_counter": "dayCounter",
+        "telescopic_value_dates": "telescopicValueDates",
+        "averaging_method": "averagingMethod",
+        "lookback_days": "lookbackDays",
+        "lockout_days": "lockoutDays",
+        "apply_observation_shift": "applyObservationShift",
+        "compound_spread": "compoundSpread",
+        "rate_computation_start_date": "rateComputationStartDate",
+        "rate_computation_end_date": "rateComputationEndDate",
+    }
+
+    kwargs = {}
+    for param_name, kw_name in _KWARGS.items():
+        value = locals()[param_name]
+        if value is not None:
+            kwargs[kw_name] = value
+
     return ql.OvernightIndexedCoupon(
         payment_date,
         nominal,
@@ -1085,13 +1143,7 @@ def qlOvernightIndexedCoupon(
         spread,
         ref_period_start,
         ref_period_end,
-        day_counter,
-        telescopic_value_dates,
-        averaging_method,
-        lookback_days,
-        lockout_days,
-        apply_observation_shift,
-        compound_spread,
+        **kwargs,
     )
 
 
@@ -1307,10 +1359,24 @@ def qlMultipleResetsCoupon(
     rate_spread: float = 0.0,
     ref_period_start: qDate = ql.Date(),
     ref_period_end: qDate = ql.Date(),
-    day_counter: qDayCounter = ql.Actual365Fixed(),
+    day_counter=None,
     ex_coupon_date: qDate = ql.Date(),
     trigger=None,
 ) -> ql.MultipleResetsCoupon:
+    if day_counter is not None:
+        day_counter = qDayCounter.__wrapped__(day_counter)
+
+    _KWARGS = {
+        "day_counter": "dayCounter",
+        "ex_coupon_date": "exCouponDate",
+    }
+
+    kwargs = {}
+    for param_name, kw_name in _KWARGS.items():
+        value = locals()[param_name]
+        if value is not None:
+            kwargs[kw_name] = value
+
     cpn = ql.MultipleResetsCoupon(
         payment_date,
         nominal,
@@ -1322,8 +1388,7 @@ def qlMultipleResetsCoupon(
         rate_spread,
         ref_period_start,
         ref_period_end,
-        day_counter,
-        ex_coupon_date,
+        **kwargs,
     )
     cpn.setPricer(ql.AveragingMultipleResetsPricer())
     return cpn
@@ -1450,6 +1515,16 @@ def qlSetCouponPricer(
         "nominals": "Nominal amounts.",
         "coupon_rates": "Coupon rates.",
         "payment_adjustment": "Payment adjustment convention.",
+        "first_period_day_count": "First period day count convention.",
+        "ex_coupon_period": "Ex-coupon period.",
+        "ex_coupon_calendar": "Ex-coupon calendar.",
+        "ex_coupon_convention": "Ex-coupon convention.",
+        "ex_coupon_end_of_month": "Ex-coupon end-of-month flag.",
+        "payment_calendar": "Payment calendar.",
+        "payment_lag": "Payment lag.",
+        "compounding": "Compounding method.",
+        "compounding_frequency": "Compounding frequency.",
+        "interest_rates": "Interest rates for compounding.",
     },
     group=EXCEL_GROUP_NAME,
 )
@@ -1459,14 +1534,52 @@ def qlFixedRateLeg(
     nominals: xlo.Array(dims=1),
     coupon_rates: xlo.Array(dims=1),
     payment_adjustment: qBusinessDayConvention = ql.Following,
+    first_period_day_count=None,
+    ex_coupon_period: qPeriod = ql.Period(),
+    ex_coupon_calendar=None,
+    ex_coupon_convention: qBusinessDayConvention = ql.Unadjusted,
+    ex_coupon_end_of_month: bool = False,
+    payment_calendar=None,
+    payment_lag: int = 0,
+    compounding: qCompounding = ql.Simple,
+    compounding_frequency: qFrequency = ql.Annual,
+    interest_rates: xlo.Array(dims=1) = None,
     trigger=None,
 ):
+    if first_period_day_count is not None:
+        first_period_day_count = qDayCounter.__wrapped__(first_period_day_count)
+    if ex_coupon_calendar is not None:
+        ex_coupon_calendar = qCalendar.__wrapped__(ex_coupon_calendar)
+    if payment_calendar is not None:
+        payment_calendar = qCalendar.__wrapped__(payment_calendar)
+    # interest_rates should be a list of InterestRate objects, not floats - no conversion needed
+
+    _KWARGS = {
+        "payment_adjustment": "paymentAdjustment",
+        "first_period_day_count": "firstPeriodDayCount",
+        "ex_coupon_period": "exCouponPeriod",
+        "ex_coupon_calendar": "exCouponCalendar",
+        "ex_coupon_convention": "exCouponConvention",
+        "ex_coupon_end_of_month": "exCouponEndOfMonth",
+        "payment_calendar": "paymentCalendar",
+        "payment_lag": "paymentLag",
+        "compounding": "compounding",
+        "compounding_frequency": "compoundingFrequency",
+        "interest_rates": "interestRates",
+    }
+
+    kwargs = {}
+    for param_name, kw_name in _KWARGS.items():
+        value = locals()[param_name]
+        if value is not None:
+            kwargs[kw_name] = value
+
     return ql.FixedRateLeg(
         schedule,
         day_counter,
         to_float_list(nominals),
         to_float_list(coupon_rates),
-        payment_adjustment,
+        **kwargs,
     )
 
 
@@ -1484,6 +1597,13 @@ def qlFixedRateLeg(
         "caps": "Caps.",
         "floors": "Floors.",
         "is_in_arrears": "Whether coupons are in arrears.",
+        "ex_coupon_period": "Ex-coupon period.",
+        "ex_coupon_calendar": "Ex-coupon calendar.",
+        "ex_coupon_convention": "Ex-coupon convention.",
+        "ex_coupon_end_of_month": "Ex-coupon end-of-month flag.",
+        "payment_calendar": "Payment calendar.",
+        "payment_lag": "Payment lag.",
+        "with_indexed_coupons": "Whether to use indexed coupons.",
     },
     group=EXCEL_GROUP_NAME,
 )
@@ -1491,7 +1611,7 @@ def qlIborLeg(
     nominals: xlo.Array(dims=1),
     schedule: ql.Schedule,
     index: ql.IborIndex,
-    payment_day_counter: qDayCounter = ql.Actual365Fixed(),
+    payment_day_counter=None,
     payment_convention: qBusinessDayConvention = ql.Following,
     fixing_days=(),
     gearings: xlo.Array(dims=1) = None,
@@ -1499,20 +1619,56 @@ def qlIborLeg(
     caps: xlo.Array(dims=1) = None,
     floors: xlo.Array(dims=1) = None,
     is_in_arrears: bool = False,
+    ex_coupon_period: qPeriod = ql.Period(),
+    ex_coupon_calendar=None,
+    ex_coupon_convention: qBusinessDayConvention = ql.Unadjusted,
+    ex_coupon_end_of_month: bool = False,
+    payment_calendar=None,
+    payment_lag: int = 0,
+    with_indexed_coupons: bool = False,
     trigger=None,
 ):
+    if payment_day_counter is not None:
+        payment_day_counter = qDayCounter.__wrapped__(payment_day_counter)
+    if ex_coupon_calendar is not None:
+        ex_coupon_calendar = qCalendar.__wrapped__(ex_coupon_calendar)
+    if payment_calendar is not None:
+        payment_calendar = qCalendar.__wrapped__(payment_calendar)
+    gearings = to_float_list(gearings)
+    spreads = to_float_list(spreads)
+    caps = to_float_list(caps)
+    floors = to_float_list(floors)
+    fixing_days = to_int_list(fixing_days)
+
+    _KWARGS = {
+        "payment_day_counter": "paymentDayCounter",
+        "payment_convention": "paymentConvention",
+        "fixing_days": "fixingDays",
+        "gearings": "gearings",
+        "spreads": "spreads",
+        "caps": "caps",
+        "floors": "floors",
+        "is_in_arrears": "isInArrears",
+        "ex_coupon_period": "exCouponPeriod",
+        "ex_coupon_calendar": "exCouponCalendar",
+        "ex_coupon_convention": "exCouponConvention",
+        "ex_coupon_end_of_month": "exCouponEndOfMonth",
+        "payment_calendar": "paymentCalendar",
+        "payment_lag": "paymentLag",
+        "with_indexed_coupons": "withIndexedCoupons",
+    }
+
+    kwargs = {}
+    for param_name, kw_name in _KWARGS.items():
+        value = locals()[param_name]
+        if value is not None:
+            kwargs[kw_name] = value
+
     return ql.IborLeg(
         to_float_list(nominals),
         schedule,
         index,
-        payment_day_counter,
-        payment_convention,
-        to_int_list(fixing_days),
-        to_float_list(gearings),
-        to_float_list(spreads),
-        to_float_list(caps),
-        to_float_list(floors),
-        is_in_arrears,
+        **kwargs,
     )
 
 
@@ -1528,6 +1684,18 @@ def qlIborLeg(
         "spreads": "Coupon spreads.",
         "telescopic_value_dates": "Use telescopic value dates.",
         "averaging_method": "Rate averaging method.",
+        "payment_calendar": "Payment calendar.",
+        "payment_lag": "Payment lag.",
+        "lookback_days": "Lookback days.",
+        "lockout_days": "Lockout days.",
+        "apply_observation_shift": "Apply observation shift.",
+        "compound_spread_daily": "Compound spread daily.",
+        "caps": "Caps.",
+        "floors": "Floors.",
+        "daily_cap_floor": "Whether cap/floor is applied daily.",
+        "in_arrears": "Whether coupons are in arrears.",
+        "naked_option": "Whether to use naked option payoff.",
+        "payment_dates": "Payment dates.",
     },
     group=EXCEL_GROUP_NAME,
 )
@@ -1535,24 +1703,69 @@ def qlOvernightLeg(
     nominals: xlo.Array(dims=1),
     schedule: ql.Schedule,
     index: ql.OvernightIndex,
-    payment_day_counter: qDayCounter = ql.Actual360(),
+    payment_day_counter=None,
     payment_convention: qBusinessDayConvention = ql.Following,
     gearings: xlo.Array(dims=1) = None,
     spreads: xlo.Array(dims=1) = None,
     telescopic_value_dates: bool = False,
     averaging_method: qRateAveragingType = ql.RateAveraging.Compound,
+    payment_calendar=None,
+    payment_lag: int = 0,
+    lookback_days: int = ql.nullInt(),
+    lockout_days: int = 0,
+    apply_observation_shift: bool = False,
+    compound_spread_daily: bool = False,
+    caps: xlo.Array(dims=1) = None,
+    floors: xlo.Array(dims=1) = None,
+    daily_cap_floor: bool = False,
+    in_arrears: bool = True,
+    naked_option: bool = False,
+    payment_dates: xlo.Array(dims=1) = None,
     trigger=None,
 ):
+    if payment_day_counter is not None:
+        payment_day_counter = qDayCounter.__wrapped__(payment_day_counter)
+    if payment_calendar is not None:
+        payment_calendar = qCalendar.__wrapped__(payment_calendar)
+    gearings = to_float_list(gearings)
+    spreads = to_float_list(spreads)
+    caps = to_float_list(caps)
+    floors = to_float_list(floors)
+    if payment_dates is not None:
+        payment_dates = _to_date_list(payment_dates)
+
+    _KWARGS = {
+        "payment_day_counter": "paymentDayCounter",
+        "payment_convention": "paymentConvention",
+        "gearings": "gearings",
+        "spreads": "spreads",
+        "telescopic_value_dates": "telescopicValueDates",
+        "averaging_method": "averagingMethod",
+        "payment_calendar": "paymentCalendar",
+        "payment_lag": "paymentLag",
+        "lookback_days": "lookbackDays",
+        "lockout_days": "lockoutDays",
+        "apply_observation_shift": "applyObservationShift",
+        "compound_spread_daily": "compoundSpreadDaily",
+        "caps": "caps",
+        "floors": "floors",
+        "daily_cap_floor": "dailyCapFloor",
+        "in_arrears": "inArrears",
+        "naked_option": "nakedOption",
+        "payment_dates": "paymentDates",
+    }
+
+    kwargs = {}
+    for param_name, kw_name in _KWARGS.items():
+        value = locals()[param_name]
+        if value is not None:
+            kwargs[kw_name] = value
+
     return ql.OvernightLeg(
         to_float_list(nominals),
         schedule,
         index,
-        payment_day_counter,
-        payment_convention,
-        to_float_list(gearings),
-        to_float_list(spreads),
-        telescopic_value_dates,
-        averaging_method,
+        **kwargs,
     )
 
 
@@ -1564,6 +1777,17 @@ def qlOvernightLeg(
         "index": "Swap index.",
         "payment_day_counter": "Payment day count convention.",
         "payment_convention": "Payment convention.",
+        "fixing_days": "Fixing-day sequence.",
+        "gearings": "Coupon gearings.",
+        "spreads": "Coupon spreads.",
+        "caps": "Caps.",
+        "floors": "Floors.",
+        "is_in_arrears": "Whether coupons are in arrears.",
+        "ex_coupon_period": "Ex-coupon period.",
+        "ex_coupon_calendar": "Ex-coupon calendar.",
+        "ex_coupon_convention": "Ex-coupon convention.",
+        "ex_coupon_end_of_month": "Ex-coupon end-of-month flag.",
+        "fixing_convention": "Fixing convention.",
     },
     group=EXCEL_GROUP_NAME,
 )
@@ -1571,16 +1795,58 @@ def qlCmsLeg(
     nominals: xlo.Array(dims=1),
     schedule: ql.Schedule,
     index: ql.SwapIndex,
-    payment_day_counter: qDayCounter = ql.Actual365Fixed(),
+    payment_day_counter=None,
     payment_convention: qBusinessDayConvention = ql.Following,
+    fixing_days: xlo.Array(dims=1) = None,
+    gearings: xlo.Array(dims=1) = None,
+    spreads: xlo.Array(dims=1) = None,
+    caps: xlo.Array(dims=1) = None,
+    floors: xlo.Array(dims=1) = None,
+    is_in_arrears: bool = False,
+    ex_coupon_period: qPeriod = ql.Period(),
+    ex_coupon_calendar=None,
+    ex_coupon_convention: qBusinessDayConvention = ql.Unadjusted,
+    ex_coupon_end_of_month: bool = False,
+    fixing_convention: qBusinessDayConvention = ql.Preceding,
     trigger=None,
 ):
+    if payment_day_counter is not None:
+        payment_day_counter = qDayCounter.__wrapped__(payment_day_counter)
+    if ex_coupon_calendar is not None:
+        ex_coupon_calendar = qCalendar.__wrapped__(ex_coupon_calendar)
+
+    _KWARGS = {
+        "payment_day_counter": "paymentDayCounter",
+        "payment_convention": "paymentConvention",
+        "fixing_days": "fixingDays",
+        "gearings": "gearings",
+        "spreads": "spreads",
+        "caps": "caps",
+        "floors": "floors",
+        "is_in_arrears": "isInArrears",
+        "ex_coupon_period": "exCouponPeriod",
+        "ex_coupon_calendar": "exCouponCalendar",
+        "ex_coupon_convention": "exCouponConvention",
+        "ex_coupon_end_of_month": "exCouponEndOfMonth",
+        "fixing_convention": "fixingConvention",
+    }
+    gearings = to_float_list(gearings)
+    spreads = to_float_list(spreads)
+    caps = to_float_list(caps)
+    floors = to_float_list(floors)
+    fixing_days = to_int_list(fixing_days)
+
+    kwargs = {}
+    for param_name, kw_name in _KWARGS.items():
+        value = locals()[param_name]
+        if value is not None:
+            kwargs[kw_name] = value
+
     return ql.CmsLeg(
         to_float_list(nominals),
         schedule,
         index,
-        payment_day_counter,
-        payment_convention,
+        **kwargs,
     )
 
 
@@ -1599,16 +1865,54 @@ def qlCmsZeroLeg(
     nominals: xlo.Array(dims=1),
     schedule: ql.Schedule,
     index: ql.SwapIndex,
-    payment_day_counter: qDayCounter = ql.Actual365Fixed(),
+    payment_day_counter=None,
     payment_convention: qBusinessDayConvention = ql.Following,
+    fixing_days: xlo.Array(dims=1) = None,
+    gearings: xlo.Array(dims=1) = None,
+    spreads: xlo.Array(dims=1) = None,
+    caps: xlo.Array(dims=1) = None,
+    floors: xlo.Array(dims=1) = None,
+    ex_coupon_period: qPeriod = ql.Period(),
+    ex_coupon_calendar: qCalendar = None,
+    ex_coupon_convention: qBusinessDayConvention = ql.Unadjusted,
+    ex_coupon_end_of_month: bool = False,
     trigger=None,
 ):
+    if payment_day_counter is not None:
+        payment_day_counter = qDayCounter.__wrapped__(payment_day_counter)
+    if ex_coupon_calendar is not None:
+        ex_coupon_calendar = qCalendar.__wrapped__(ex_coupon_calendar)
+
+    _KWARGS = {
+        "payment_day_counter": "paymentDayCounter",
+        "payment_convention": "paymentConvention",
+        "fixing_days": "fixingDays",
+        "gearings": "gearings",
+        "spreads": "spreads",
+        "caps": "caps",
+        "floors": "floors",
+        "ex_coupon_period": "exCouponPeriod",
+        "ex_coupon_calendar": "exCouponCalendar",
+        "ex_coupon_convention": "exCouponConvention",
+        "ex_coupon_end_of_month": "exCouponEndOfMonth",
+    }
+    gearings = to_float_list(gearings)
+    spreads = to_float_list(spreads)
+    caps = to_float_list(caps)
+    floors = to_float_list(floors)
+    fixing_days = to_int_list(fixing_days)
+
+    kwargs = {}
+    for param_name, kw_name in _KWARGS.items():
+        value = locals()[param_name]
+        if value is not None:
+            kwargs[kw_name] = value
+
     return ql.CmsZeroLeg(
         to_float_list(nominals),
         schedule,
         index,
-        payment_day_counter,
-        payment_convention,
+        **kwargs,
     )
 
 
@@ -1620,6 +1924,12 @@ def qlCmsZeroLeg(
         "index": "Swap spread index.",
         "payment_day_counter": "Payment day count convention.",
         "payment_convention": "Payment convention.",
+        "fixing_days": "Fixing-day sequence.",
+        "gearings": "Coupon gearings.",
+        "spreads": "Coupon spreads.",
+        "caps": "Caps.",
+        "floors": "Floors.",
+        "is_in_arrears": "Whether coupons are in arrears.",
     },
     group=EXCEL_GROUP_NAME,
 )
@@ -1627,16 +1937,46 @@ def qlCmsSpreadLeg(
     nominals: xlo.Array(dims=1),
     schedule: ql.Schedule,
     index: ql.SwapSpreadIndex,
-    payment_day_counter: qDayCounter = ql.Actual365Fixed(),
+    payment_day_counter=None,
     payment_convention: qBusinessDayConvention = ql.Following,
+    fixing_days: xlo.Array(dims=1) = None,
+    gearings: xlo.Array(dims=1) = None,
+    spreads: xlo.Array(dims=1) = None,
+    caps: xlo.Array(dims=1) = None,
+    floors: xlo.Array(dims=1) = None,
+    is_in_arrears: bool = False,
     trigger=None,
 ):
+    if payment_day_counter is not None:
+        payment_day_counter = qDayCounter.__wrapped__(payment_day_counter)
+    gearings = to_float_list(gearings)
+    spreads = to_float_list(spreads)
+    caps = to_float_list(caps)
+    floors = to_float_list(floors)
+    fixing_days = to_int_list(fixing_days)
+
+    _KWARGS = {
+        "payment_day_counter": "paymentDayCounter",
+        "payment_convention": "paymentConvention",
+        "fixing_days": "fixingDays",
+        "gearings": "gearings",
+        "spreads": "spreads",
+        "caps": "caps",
+        "floors": "floors",
+        "is_in_arrears": "isInArrears",
+    }
+
+    kwargs = {}
+    for param_name, kw_name in _KWARGS.items():
+        value = locals()[param_name]
+        if value is not None:
+            kwargs[kw_name] = value
+
     return ql.CmsSpreadLeg(
         to_float_list(nominals),
         schedule,
         index,
-        payment_day_counter,
-        payment_convention,
+        **kwargs,
     )
 
 
@@ -1647,6 +1987,19 @@ def qlCmsSpreadLeg(
         "index": "Ibor index.",
         "resets_per_coupon": "Number of resets per coupon.",
         "nominals": "Nominal amounts.",
+        "payment_day_counter": "Payment day count convention.",
+        "payment_convention": "Payment convention.",
+        "payment_calendar": "Payment calendar.",
+        "payment_lag": "Payment lag.",
+        "fixing_days": "Fixing-day sequence.",
+        "gearings": "Coupon gearings.",
+        "coupon_spreads": "Coupon spreads.",
+        "rate_spreads": "Rate spreads.",
+        "ex_coupon_period": "Ex-coupon period.",
+        "ex_coupon_calendar": "Ex-coupon calendar.",
+        "ex_coupon_convention": "Ex-coupon convention.",
+        "ex_coupon_end_of_month": "Ex-coupon end-of-month flag.",
+        "averaging_method": "Rate averaging method.",
     },
     group=EXCEL_GROUP_NAME,
 )
@@ -1655,10 +2008,56 @@ def qlMultipleResetsLeg(
     index: ql.IborIndex,
     resets_per_coupon: int,
     nominals: xlo.Array(dims=1),
+    payment_day_counter=None,
+    payment_convention: qBusinessDayConvention = ql.Following,
+    payment_calendar=None,
+    payment_lag: int = 0,
+    fixing_days: xlo.Array(dims=1) = None,
+    gearings: xlo.Array(dims=1) = None,
+    coupon_spreads: xlo.Array(dims=1) = None,
+    rate_spreads: xlo.Array(dims=1) = None,
+    ex_coupon_period: qPeriod = ql.Period(),
+    ex_coupon_calendar=None,
+    ex_coupon_convention: qBusinessDayConvention = ql.Unadjusted,
+    ex_coupon_end_of_month: bool = False,
+    averaging_method: qRateAveragingType = ql.RateAveraging.Compound,
     trigger=None,
 ):
+    if payment_day_counter is not None:
+        payment_day_counter = qDayCounter.__wrapped__(payment_day_counter)
+    if payment_calendar is not None:
+        payment_calendar = qCalendar.__wrapped__(payment_calendar)
+    if ex_coupon_calendar is not None:
+        ex_coupon_calendar = qCalendar.__wrapped__(ex_coupon_calendar)
+    gearings = to_float_list(gearings)
+    coupon_spreads = to_float_list(coupon_spreads)
+    rate_spreads = to_float_list(rate_spreads)
+    fixing_days = to_int_list(fixing_days)
+
+    _KWARGS = {
+        "payment_day_counter": "paymentDayCounter",
+        "payment_convention": "paymentConvention",
+        "payment_calendar": "paymentCalendar",
+        "payment_lag": "paymentLag",
+        "fixing_days": "fixingDays",
+        "gearings": "gearings",
+        "coupon_spreads": "couponSpreads",
+        "rate_spreads": "rateSpreads",
+        "ex_coupon_period": "exCouponPeriod",
+        "ex_coupon_calendar": "exCouponCalendar",
+        "ex_coupon_convention": "exCouponConvention",
+        "ex_coupon_end_of_month": "exCouponEndOfMonth",
+        "averaging_method": "averagingMethod",
+    }
+
+    kwargs = {}
+    for param_name, kw_name in _KWARGS.items():
+        value = locals()[param_name]
+        if value is not None:
+            kwargs[kw_name] = value
+
     return ql.MultipleResetsLeg(
-        full_reset_schedule, index, resets_per_coupon, to_float_list(nominals)
+        full_reset_schedule, index, resets_per_coupon, to_float_list(nominals), **kwargs
     )
 
 
@@ -1669,7 +2068,13 @@ def qlMultipleResetsLeg(
         "schedule": "Payment schedule.",
         "index": "Ibor index.",
         "payment_day_counter": "Payment day count convention.",
-        "payment_convention": "Payment convention.",
+        "fixing_days": "Fixing-day sequence.",
+        "gearings": "Coupon gearings.",
+        "spreads": "Coupon spreads.",
+        "lower_triggers": "Lower triggers.",
+        "upper_triggers": "Upper triggers.",
+        "observation_tenor": "Observation tenor.",
+        "observation_convention": "Observation convention.",
     },
     group=EXCEL_GROUP_NAME,
 )
@@ -1677,16 +2082,48 @@ def qlRangeAccrualLeg(
     nominals: xlo.Array(dims=1),
     schedule: ql.Schedule,
     index: ql.IborIndex,
-    payment_day_counter: qDayCounter = ql.Actual360(),
+    payment_day_counter=None,
     payment_convention: qBusinessDayConvention = ql.Following,
+    fixing_days: xlo.Array(dims=1) = None,
+    gearings: xlo.Array(dims=1) = None,
+    spreads: xlo.Array(dims=1) = None,
+    lower_triggers: xlo.Array(dims=1) = None,
+    upper_triggers: xlo.Array(dims=1) = None,
+    observation_tenor: qPeriod = ql.Period(),
+    observation_convention: qBusinessDayConvention = ql.ModifiedFollowing,
     trigger=None,
 ):
+    if payment_day_counter is not None:
+        payment_day_counter = qDayCounter.__wrapped__(payment_day_counter)
+    gearings = to_float_list(gearings)
+    spreads = to_float_list(spreads)
+    lower_triggers = to_float_list(lower_triggers)
+    upper_triggers = to_float_list(upper_triggers)
+    fixing_days = to_int_list(fixing_days)
+
+    _KWARGS = {
+        "payment_day_counter": "paymentDayCounter",
+        "payment_convention": "paymentConvention",
+        "fixing_days": "fixingDays",
+        "gearings": "gearings",
+        "spreads": "spreads",
+        "lower_triggers": "lowerTriggers",
+        "upper_triggers": "upperTriggers",
+        "observation_tenor": "observationTenor",
+        "observation_convention": "observationConvention",
+    }
+
+    kwargs = {}
+    for param_name, kw_name in _KWARGS.items():
+        value = locals()[param_name]
+        if value is not None:
+            kwargs[kw_name] = value
+
     return ql.RangeAccrualLeg(
         to_float_list(nominals),
         schedule,
         index,
-        payment_day_counter,
-        payment_convention,
+        **kwargs,
     )
 
 
