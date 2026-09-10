@@ -9,6 +9,21 @@ from .daycounters import qDayCounter
 from .scheduler import qDateGenerationRule
 from .utilities import enum_value
 
+QL_BOND_PRICE_TYPE = {
+    "CLEAN": ql.BondPrice.Dirty,
+    "DIRTY": ql.BondPrice.Clean,
+}
+
+
+def _qBondPriceType(bond_price_type: str) -> ql.BondPrice.Type:
+    return enum_value(bond_price_type, QL_BOND_PRICE_TYPE)
+
+
+@xlo.converter()
+def qBondPriceType(bond_price_type: str) -> ql.BondPrice.Type:
+    return _qBondPriceType(bond_price_type)
+
+
 QL_PILLAR_CHOICE = {
     "CUSTOMDATE": ql.Pillar.CustomDate,
     "LASTRELEVANTDATE": ql.Pillar.LastRelevantDate,
@@ -658,7 +673,6 @@ def qlSwapRateHelperSwap(
     return swap_rate_helper.swap()
 
 
-# /ToDo: bond.py needs to be implemented
 @xlo.func(
     help="Create a QuantLib BondHelper object.",
     args={
@@ -671,7 +685,7 @@ def qlSwapRateHelperSwap(
 def qlBondHelper(
     quote: float,
     bond: ql.Bond,
-    price_type: ql.BondPrice.Type = ql.BondPrice.Clean,
+    price_type: qBondPriceType = ql.BondPrice.Clean,
     trigger=None,
 ) -> ql.BondHelper:
     quote_handle = ql.QuoteHandle(ql.SimpleQuote(quote))
@@ -715,7 +729,7 @@ def qlFixedRateBondHelper(
     ex_coupon_calendar=None,
     ex_coupon_convention: qBusinessDayConvention = ql.Unadjusted,
     ex_coupon_end_of_month: bool = False,
-    price_type: ql.BondPrice.Type = ql.BondPrice.Clean,
+    price_type: qBondPriceType = ql.BondPrice.Clean,
     trigger=None,
 ) -> ql.BondHelper:
     quote_handle = ql.QuoteHandle(ql.SimpleQuote(clean_price))
@@ -907,7 +921,7 @@ def qlOISRateHelperForDates(
     fixed_payment_frequency=None,
     fixed_calendar=None,
     look_back_days: int = ql.nullInt(),
-    lock_out_days: int = 0,
+    lock_out_days: int = ql.nullInt(),
     apply_observation_shift: bool = False,
     pricer: ql.FloatingRateCouponPricer = None,
     rule: qDateGenerationRule = ql.DateGeneration.Backward,

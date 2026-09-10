@@ -1187,6 +1187,7 @@ def qlCappedFlooredOvernightIndexedCoupon(
         "day_counter": "Day count convention.",
         "is_in_arrears": "Whether fixing is in arrears.",
         "ex_coupon_date": "Ex-coupon date.",
+        "fixing_convention": "Fixing convention.",
     },
     group=EXCEL_GROUP_NAME,
 )
@@ -1201,11 +1202,27 @@ def qlCmsCoupon(
     spread: float = 0.0,
     ref_period_start: qDate = ql.Date(),
     ref_period_end: qDate = ql.Date(),
-    day_counter: qDayCounter = ql.Actual365Fixed(),
+    day_counter=None,
     is_in_arrears: bool = False,
     ex_coupon_date: qDate = ql.Date(),
+    fixing_convention: qBusinessDayConvention = ql.Preceding,
     trigger=None,
 ) -> ql.CmsCoupon:
+    if day_counter is not None:
+        day_counter = qDayCounter.__wrapped__(day_counter)
+    _KWARGS = {
+        "day_counter": "dayCounter",
+        "is_in_arrears": "isInArrears",
+        "ex_coupon_date": "exCouponDate",
+        "fixing_convention": "fixingConvention",
+    }
+
+    kwargs = {}
+    for param_name, kw_name in _KWARGS.items():
+        value = locals()[param_name]
+        if value is not None:
+            kwargs[kw_name] = value
+
     return ql.CmsCoupon(
         payment_date,
         nominal,
@@ -1217,9 +1234,7 @@ def qlCmsCoupon(
         spread,
         ref_period_start,
         ref_period_end,
-        day_counter,
-        is_in_arrears,
-        ex_coupon_date,
+        **kwargs,
     )
 
 
@@ -1239,6 +1254,7 @@ def qlCmsCoupon(
         "day_counter": "Day count convention.",
         "is_in_arrears": "Whether fixing is in arrears.",
         "ex_coupon_date": "Ex-coupon date.",
+        "fixing_convention": "Fixing convention.",
     },
     group=EXCEL_GROUP_NAME,
 )
@@ -1253,11 +1269,27 @@ def qlCmsSpreadCoupon(
     spread: float = 0.0,
     ref_period_start: qDate = ql.Date(),
     ref_period_end: qDate = ql.Date(),
-    day_counter: qDayCounter = ql.Actual365Fixed(),
+    day_counter=None,
     is_in_arrears: bool = False,
     ex_coupon_date: qDate = ql.Date(),
+    fixing_convention: qBusinessDayConvention = ql.Preceding,
     trigger=None,
 ) -> ql.CmsSpreadCoupon:
+    if day_counter is not None:
+        day_counter = qDayCounter.__wrapped__(day_counter)
+    _KWARGS = {
+        "day_counter": "dayCounter",
+        "is_in_arrears": "isInArrears",
+        "ex_coupon_date": "exCouponDate",
+        "fixing_convention": "fixingConvention",
+    }
+
+    kwargs = {}
+    for param_name, kw_name in _KWARGS.items():
+        value = locals()[param_name]
+        if value is not None:
+            kwargs[kw_name] = value
+
     return ql.CmsSpreadCoupon(
         payment_date,
         nominal,
@@ -1269,9 +1301,7 @@ def qlCmsSpreadCoupon(
         spread,
         ref_period_start,
         ref_period_end,
-        day_counter,
-        is_in_arrears,
-        ex_coupon_date,
+        **kwargs,
     )
 
 

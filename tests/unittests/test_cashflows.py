@@ -63,7 +63,9 @@ from quantlib_xloil.cashflows import (
     qlCouponRate,
     qlCouponReferencePeriodEnd,
     qlCouponReferencePeriodStart,
+    qlCmsCoupon,
     qlCmsLeg,
+    qlCmsSpreadCoupon,
     qlCmsSpreadLeg,
     qlCmsZeroLeg,
     qlFixedRateCoupon,
@@ -1040,6 +1042,100 @@ def test_qlMultipleResetsLeg_constructor():
     assert len(leg) > 0
     assert qlCashFlowsStartDate(leg) == start
     assert qlCashFlowsMaturityDate(leg) == end
+
+
+def test_qlCmsCoupon_constructor():
+    start = qlDate(2024, 1, 2)
+    end = qlDate(2025, 1, 2)
+    payment_date = end
+    curve = _curve(start, 0.03)
+    index = qlEuribor(ql.Period("6M"), curve)
+    swap_index = qlSwapIndex(
+        family_name="TestSwapIndex",
+        tenor=ql.Period("10Y"),
+        settlement_days=2,
+        currency=qCurrency.__wrapped__("EUR"),
+        calendar=qlCalendar("TARGET"),
+        fixed_leg_tenor=ql.Period("1Y"),
+        fixed_leg_convention=qBusinessDayConvention.__wrapped__("MODIFIEDFOLLOWING"),
+        fixed_leg_day_counter=qlDayCounter("ACTUAL365FIXED"),
+        ibor_index=index,
+        discount_curve=curve,
+    )
+
+    coupon = qlCmsCoupon(
+        payment_date,
+        100.0,
+        start,
+        end,
+        fixing_days=2,
+        index=swap_index,
+        gearing=1.0,
+        spread=0.001,
+        day_counter=qlDayCounter("ACTUAL365FIXED"),
+        is_in_arrears=False,
+    )
+
+    assert coupon is not None
+    assert qlCouponNominal(coupon) == 100.0
+    assert qlCouponAccrualStartDate(coupon) == start
+    assert qlCouponAccrualEndDate(coupon) == end
+    assert qlFloatingRateCouponGearing(coupon) == 1.0
+    assert qlFloatingRateCouponSpread(coupon) == 0.001
+
+
+def test_qlCmsSpreadCoupon_constructor():
+    start = qlDate(2024, 1, 2)
+    end = qlDate(2025, 1, 2)
+    payment_date = end
+    curve = _curve(start, 0.03)
+    index1 = qlEuribor(ql.Period("6M"), curve)
+    index2 = qlEuribor(ql.Period("12M"), curve)
+    swap_index1 = qlSwapIndex(
+        family_name="TestSwapIndex1",
+        tenor=ql.Period("10Y"),
+        settlement_days=2,
+        currency=qCurrency.__wrapped__("EUR"),
+        calendar=qlCalendar("TARGET"),
+        fixed_leg_tenor=ql.Period("1Y"),
+        fixed_leg_convention=qBusinessDayConvention.__wrapped__("MODIFIEDFOLLOWING"),
+        fixed_leg_day_counter=qlDayCounter("ACTUAL365FIXED"),
+        ibor_index=index1,
+        discount_curve=curve,
+    )
+    swap_index2 = qlSwapIndex(
+        family_name="TestSwapIndex2",
+        tenor=ql.Period("10Y"),
+        settlement_days=2,
+        currency=qCurrency.__wrapped__("EUR"),
+        calendar=qlCalendar("TARGET"),
+        fixed_leg_tenor=ql.Period("1Y"),
+        fixed_leg_convention=qBusinessDayConvention.__wrapped__("MODIFIEDFOLLOWING"),
+        fixed_leg_day_counter=qlDayCounter("ACTUAL365FIXED"),
+        ibor_index=index2,
+        discount_curve=curve,
+    )
+    spread_index = qlSwapSpreadIndex("TestSpreadIndex", swap_index1, swap_index2)
+
+    coupon = qlCmsSpreadCoupon(
+        payment_date,
+        100.0,
+        start,
+        end,
+        fixing_days=2,
+        index=spread_index,
+        gearing=1.0,
+        spread=0.001,
+        day_counter=qlDayCounter("ACTUAL365FIXED"),
+        is_in_arrears=False,
+    )
+
+    assert coupon is not None
+    assert qlCouponNominal(coupon) == 100.0
+    assert qlCouponAccrualStartDate(coupon) == start
+    assert qlCouponAccrualEndDate(coupon) == end
+    assert qlFloatingRateCouponGearing(coupon) == 1.0
+    assert qlFloatingRateCouponSpread(coupon) == 0.001
 
 
 def test_qlRangeAccrualLeg_constructor():

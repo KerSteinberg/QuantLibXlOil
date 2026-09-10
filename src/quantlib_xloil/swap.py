@@ -1268,8 +1268,8 @@ def qlOvernightIndexedSwap(
     payment_calendar: qCalendar = None,
     telescopic_value_dates: bool = False,
     averaging_method: qRateAveragingType = ql.RateAveraging.Compound,
-    lookback_days: int = 0,
-    lockout_days: int = 0,
+    lookback_days: int = ql.nullInt(),
+    lockout_days: int = ql.nullInt(),
     apply_observation_shift: bool = False,
     trigger=None,
 ) -> ql.OvernightIndexedSwap:
@@ -1337,8 +1337,8 @@ def qlOvernightIndexedSwap2(
     payment_calendar: qCalendar = None,
     telescopic_value_dates: bool = False,
     averaging_method: qRateAveragingType = ql.RateAveraging.Compound,
-    lookback_days: int = 0,
-    lockout_days: int = 0,
+    lookback_days: int = ql.nullInt(),
+    lockout_days: int = ql.nullInt(),
     apply_observation_shift: bool = False,
     trigger=None,
 ) -> ql.OvernightIndexedSwap:
