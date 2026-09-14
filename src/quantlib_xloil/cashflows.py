@@ -821,6 +821,13 @@ def qlOvernightIndexedCoupon(
     )
 
 
+@xlo.func(
+    help="Return overnight coupon fixing dates.",
+    args={
+        "coupon": "QuantLib OvernightIndexedCoupon.",
+    },
+    group=EXCEL_GROUP_NAME,
+)
 def qlOvernightIndexedCouponFixingDates(
     coupon: ql.OvernightIndexedCoupon, trigger=None
 ) -> tuple[ql.Date, ...]:
@@ -880,13 +887,6 @@ def qlOvernightIndexedCouponValueDates(
 
 
 @xlo.func(
-    help="Return overnight coupon lockout days.",
-    args={
-        "coupon": "QuantLib OvernightIndexedCoupon.",
-    },
-    group=EXCEL_GROUP_NAME,
-)
-@xlo.func(
     help="Return overnight coupon averaging method.",
     args={
         "coupon": "QuantLib OvernightIndexedCoupon.",
@@ -899,6 +899,13 @@ def qlOvernightIndexedCouponAveragingMethod(
     return first_key(QL_RATE_AVERAGING_TYPE, coupon.averagingMethod(), UNKNOWN_KEY)
 
 
+@xlo.func(
+    help="Return overnight coupon lockout days.",
+    args={
+        "coupon": "QuantLib OvernightIndexedCoupon.",
+    },
+    group=EXCEL_GROUP_NAME,
+)
 def qlOvernightIndexedCouponLockoutDays(
     coupon: ql.OvernightIndexedCoupon, trigger=None
 ) -> int:
@@ -957,13 +964,6 @@ def qlOvernightIndexedCouponEffectiveSpread(
     return coupon.effectiveSpread()
 
 
-@xlo.func(
-    help="Return overnight coupon fixing dates.",
-    args={
-        "coupon": "QuantLib OvernightIndexedCoupon.",
-    },
-    group=EXCEL_GROUP_NAME,
-)
 @xlo.func(
     help="Return overnight coupon effective index fixing.",
     args={
@@ -1270,6 +1270,17 @@ def qlIborCoupon(
     )
     cpn.setPricer(ql.BlackIborCouponPricer())
     return cpn
+
+
+@xlo.func(
+    help="Return whether the Ibor coupon has been fixed.",
+    args={
+        "coupon": "QuantLib IborCoupon.",
+    },
+    group=EXCEL_GROUP_NAME,
+)
+def qlIborCouponHasFixed(coupon: ql.IborCoupon, trigger=None) -> bool:
+    return coupon.hasFixed()
 
 
 @xlo.func(
@@ -1784,7 +1795,7 @@ def qlCmsCouponPricerSetSwaptionVolatility(
 def qlAnalyticHaganPricer(
     volatility: ql.SwaptionVolatilityStructureHandle,
     model: qYieldCurveModel,
-    mean_reversion: ql.QuoteHandle,
+    mean_reversion: qQuoteHandle,
     trigger=None,
 ) -> ql.AnalyticHaganPricer:
     return ql.AnalyticHaganPricer(volatility, model, mean_reversion)
@@ -1805,7 +1816,7 @@ def qlAnalyticHaganPricer(
 def qlNumericHaganPricer(
     volatility: ql.SwaptionVolatilityStructureHandle,
     model: qYieldCurveModel,
-    mean_reversion: ql.QuoteHandle,
+    mean_reversion: qQuoteHandle,
     lower_limit: float = 0.0,
     upper_limit: float = 1.0,
     precision: float = 1e-6,
@@ -2032,6 +2043,7 @@ def qlLognormalCmsSpreadPricer(
     )
 
 
+# TODO to test
 @xlo.func(
     help="Return swaplet price from a LognormalCmsSpreadPricer.",
     args={

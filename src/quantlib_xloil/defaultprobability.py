@@ -287,7 +287,7 @@ def qlSurvivalProbabilityCurve(
     dates: xlo.Array(dims=1),
     survival_probabilities: xlo.Array(dims=1),
     day_counter: qDayCounter,
-    calendar=None,  # SWIG default: Calendar()
+    calendar=None,
     trigger=None,
 ) -> ql.DefaultProbabilityTermStructureHandle:
     args = [_to_date_list(dates), to_float_list(survival_probabilities), day_counter]
